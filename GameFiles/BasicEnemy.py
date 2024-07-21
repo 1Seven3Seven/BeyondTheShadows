@@ -87,7 +87,7 @@ class BasicEnemy(Entity):
         self.circle_timer = CIRCLE_SPAWN_DELAY
 
         self.circles.append(
-            Circle(self.sprite.width / 2, self.sprite.height / 2,
+            Circle(self.sprite.get_width() / 2, self.sprite.get_height() / 2,
                    random.random() - 0.5, random.random() - 0.5,
                    CIRCLE_RADIUS)
         )
@@ -137,7 +137,7 @@ class BasicEnemy(Entity):
         for circle in self.circles:
             self.sub_sprite.fill((0, 0, 0))
             pygame.draw.circle(self.sub_sprite, (10, 10, 10),
-                               (self.sub_sprite.width // 2, self.sub_sprite.height // 2),
+                               (self.sub_sprite.get_width() // 2, self.sub_sprite.get_height() // 2),
                                circle.radius)
 
             self.sub_sprite_rect.center = circle.x, circle.y
