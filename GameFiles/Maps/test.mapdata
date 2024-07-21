@@ -1,0 +1,9 @@
+# Width and height
+5,5
+# The map data itself
+# A series of boolean values for if a tile exists or not
+11111
+10001
+10001
+10001
+11111
