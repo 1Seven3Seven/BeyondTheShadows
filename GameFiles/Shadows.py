@@ -30,6 +30,23 @@ class ShadowTile:
         if self.darkness < 0:
             self.darkness = 0
 
+    def add_light_source(self, light_source: LightSource) -> None:
+        """
+        Adds the light source to the internal dictionary of affecting light sources.
+        """
+
+        self.affecting_light_sources[light_source] = light_source.brightness
+        self.calculate_darkness()
+
+    def remove_light_source(self, light_source: LightSource) -> None:
+        """
+        Removes the light source from the internal dictionary of affecting light sources.
+        """
+
+        if light_source in self.affecting_light_sources:
+            del self.affecting_light_sources[light_source]
+            self.calculate_darkness()
+
 
 class Shadows:
     TILE_SIZE = 16
@@ -98,8 +115,7 @@ class Shadows:
 
         # Update any affected tiles
         for affected_tile in self._affected_tiles(light_source):
-            affected_tile.affecting_light_sources[light_source] = light_source.brightness
-            affected_tile.calculate_darkness()
+            affected_tile.add_light_source(light_source)
 
     def remove_light_source(self, light_source: LightSource) -> None:
         # Bye
@@ -107,9 +123,7 @@ class Shadows:
 
         # Update any affected tiles
         for affected_tile in self._affected_tiles(light_source):
-            if light_source in affected_tile.affecting_light_sources:
-                del affected_tile.affecting_light_sources[light_source]
-                affected_tile.calculate_darkness()
+            affected_tile.remove_light_source(light_source)
 
     def render(self, surface: pygame.Surface) -> None:
         tile_surface = pygame.Surface((self.TILE_SIZE, self.TILE_SIZE))
