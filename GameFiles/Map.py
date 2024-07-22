@@ -2,10 +2,10 @@ import pygame
 
 from .MapData import MapData
 
-TILE_SIZE = 128
-
 
 class Map:
+    TILE_SIZE = 128
+
     def __init__(self, map_data: MapData | None = None):
         self.tiles: dict[str, pygame.Rect] = {}
         """
@@ -13,7 +13,9 @@ class Map:
         """
 
         self.width: int = 0
+        """The width in map tiles."""
         self.height: int = 0
+        """The height in map tiles."""
 
         if map_data is not None:
             self.generate_from(map_data)
@@ -26,7 +28,8 @@ class Map:
                 if tile == 0:
                     continue
 
-                self.tiles[f"{x},{y}"] = pygame.Rect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+                self.tiles[f"{x},{y}"] = pygame.Rect(x * self.TILE_SIZE, y * self.TILE_SIZE,
+                                                     self.TILE_SIZE, self.TILE_SIZE)
 
         self.width = map_data.width
         self.height = map_data.height

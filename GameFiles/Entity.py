@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 import pygame
 
-from .Map import Map, TILE_SIZE
+from .Map import Map
 
 
 class Entity(ABC):
@@ -18,8 +18,8 @@ class Entity(ABC):
 
     def _get_potential_collision_rectangles(self, map_: Map) -> list[pygame.Rect]:
         # Grab the tile we are currently in
-        tile_x_base = self.rect.x // TILE_SIZE
-        tile_y_base = self.rect.y // TILE_SIZE
+        tile_x_base = self.rect.x // Map.TILE_SIZE
+        tile_y_base = self.rect.y // Map.TILE_SIZE
 
         # Grab any rectangles from the map that we can collide with
         potential_collision_rectangles = []
