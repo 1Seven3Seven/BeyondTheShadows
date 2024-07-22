@@ -20,7 +20,13 @@ class Game:
         ]
 
         self.map: GameFiles.Map = GameFiles.Map(
-            GameFiles.MapData.from_file(pathlib.Path("GameFiles/Maps/test.mapdata")))
+            GameFiles.MapData.from_file(pathlib.Path("GameFiles/Maps/test.mapdata"))
+        )
+
+        self.shadows: GameFiles.Shadows = GameFiles.Shadows(
+            self.map.width * self.map.TILE_SIZE // GameFiles.Shadows.TILE_SIZE,
+            self.map.height * self.map.TILE_SIZE // GameFiles.Shadows.TILE_SIZE
+        )
 
     def step(self):
         for event in pygame.event.get():
@@ -37,6 +43,14 @@ class Game:
 
         keys = pygame.key.get_pressed()
 
+        keys_down = pygame.key.get_just_pressed()
+
+        if keys_down[pygame.K_SPACE]:
+            print("HE")
+            self.shadows.add_light_source(
+                GameFiles.LightSource(self.player.rect.centerx, self.player.rect.centery, 127, 100)
+            )
+
         self.player.move(keys, self.map)
 
         for tile_rect in self.map.tiles.values():
@@ -49,6 +63,9 @@ class Game:
             enemy.draw(self.window)
 
         self.player.draw(self.window)
+
+        self.shadows.render(self.window)
+
         pygame.display.flip()
 
         tick = self.clock.tick(60)

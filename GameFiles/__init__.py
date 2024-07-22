@@ -1,5 +1,8 @@
 from .Entity import Entity
 
+from .LightSource import LightSource
+from .Shadows import Shadows
+
 from .Player import Player
 from .BasicEnemy import BasicEnemy
 
