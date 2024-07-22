@@ -43,14 +43,6 @@ class Game:
 
         keys = pygame.key.get_pressed()
 
-        keys_down = pygame.key.get_just_pressed()
-
-        if keys_down[pygame.K_SPACE]:
-            print("HE")
-            self.shadows.add_light_source(
-                GameFiles.LightSource(self.player.rect.centerx, self.player.rect.centery, 127, 100)
-            )
-
         self.player.move(keys, self.map)
 
         for tile_rect in self.map.tiles.values():
@@ -62,7 +54,15 @@ class Game:
 
             enemy.draw(self.window)
 
+        self.player.update()
         self.player.draw(self.window)
+
+        if self.player.attack_delay == 0:
+            if keys[pygame.K_SPACE]:
+                self.shadows.add_light_source(
+                    GameFiles.LightSource(self.player.rect.centerx, self.player.rect.centery, 127, 100)
+                )
+                self.player.attack_delay = self.player.ATTACK_DELAY
 
         self.shadows.render(self.window)
 

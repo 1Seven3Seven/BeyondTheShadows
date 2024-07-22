@@ -1,15 +1,20 @@
 import pygame
 
-from . import Map
+from .Map import Map
 from .Entity import Entity
 
 
 class Player(Entity):
+    ATTACK_DELAY = 60
+
     def __init__(self):
         super().__init__(300, 300, 50, 50, 100)
 
-    def update(self, *args, **kwargs):
-        pass
+        self.attack_delay = self.ATTACK_DELAY
+
+    def update(self):
+        if self.attack_delay > 0:
+            self.attack_delay -= 1
 
     def move(self, keys: pygame.key.ScancodeWrapper, map_: Map):
         y_movement = 0
