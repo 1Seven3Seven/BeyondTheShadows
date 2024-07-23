@@ -1,3 +1,4 @@
+import math
 from typing import Generator
 
 import pygame
@@ -25,17 +26,22 @@ class ShadowTile:
         Calculate the darkness given the light sources that affect this tile.
         """
 
-        self.darkness = 255 - sum(self.affecting_light_sources.values())
+        if self.affecting_light_sources:
+            self.darkness = 255 - max(self.affecting_light_sources.values())
+        else:
+            self.darkness = 255
 
         if self.darkness < 0:
             self.darkness = 0
 
-    def add_light_source(self, light_source: LightSource) -> None:
+    def add_light_source(self, light_source: LightSource, distance: float) -> None:
         """
         Adds the light source to the internal dictionary of affecting light sources.
         """
 
-        self.affecting_light_sources[light_source] = light_source.brightness
+        multiplier = 1 - distance / light_source.radius * 0.5
+
+        self.affecting_light_sources[light_source] = int(light_source.brightness * multiplier)
         self.calculate_darkness()
 
     def remove_light_source(self, light_source: LightSource) -> None:
@@ -72,7 +78,12 @@ class Shadows:
 
         self.light_sources: list[LightSource] = []
 
-    def _affected_tiles(self, light_source: LightSource) -> Generator[ShadowTile, None, None]:
+    def _tiles_affected_by(self, light_source: LightSource) -> Generator[tuple[ShadowTile, float], None, None]:
+        """
+        Iterates over all tiles that are affected by the light source.
+        Each iterations returns an affected tile and the distance to that tile squared.
+        """
+
         # Convert the position into a tile
         base_tile_x = light_source.x // self.TILE_SIZE
         base_tile_y = light_source.y // self.TILE_SIZE
@@ -107,22 +118,22 @@ class Shadows:
 
                 # If close enough yield
                 if distance_to_tile_squared <= light_radius_squared:
-                    yield self.tiles[tile_y][tile_x]
+                    yield self.tiles[tile_y][tile_x], distance_to_tile_squared
 
     def add_light_source(self, light_source: LightSource) -> None:
         # Add the light source
         self.light_sources.append(light_source)
 
         # Update any affected tiles
-        for affected_tile in self._affected_tiles(light_source):
-            affected_tile.add_light_source(light_source)
+        for affected_tile, distance_squared in self._tiles_affected_by(light_source):
+            affected_tile.add_light_source(light_source, math.sqrt(distance_squared))
 
     def remove_light_source(self, light_source: LightSource) -> None:
         # Bye
         self.light_sources.remove(light_source)
 
         # Update any affected tiles
-        for affected_tile in self._affected_tiles(light_source):
+        for affected_tile, _ in self._tiles_affected_by(light_source):
             affected_tile.remove_light_source(light_source)
 
     def render(self, surface: pygame.Surface) -> None:
