@@ -28,6 +28,8 @@ class Game:
             self.map.height * self.map.TILE_SIZE // GameFiles.Shadows.TILE_SIZE
         )
 
+        self.potion_handler: GameFiles.PotionHandler = GameFiles.PotionHandler()
+
     def step(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -42,11 +44,19 @@ class Game:
         self.window.fill((127, 127, 127))
 
         keys = pygame.key.get_pressed()
+        mouse_state = GameFiles.Helpers.get_mouse_state()
+
+        self.potion_handler.update(self.map, self.enemies, self.shadows)
 
         self.player.move(keys, self.map)
+        self.player.update(keys, mouse_state, self.potion_handler)
+
+        self.player.draw(self.window)
 
         for tile_rect in self.map.tiles.values():
             pygame.draw.rect(self.window, (255, 127, 127), tile_rect)
+
+        self.potion_handler.draw(self.window)
 
         for enemy in self.enemies:
             enemy.update(self.player)
@@ -54,15 +64,9 @@ class Game:
 
             enemy.draw(self.window)
 
-        self.player.update()
-        self.player.draw(self.window)
-
-        if self.player.attack_delay == 0:
-            if keys[pygame.K_SPACE]:
-                self.shadows.add_light_source(
-                    GameFiles.LightSource(self.player.rect.centerx, self.player.rect.centery, 127, 100)
-                )
-                self.player.attack_delay = self.player.ATTACK_DELAY
+        if keys[pygame.K_BACKSPACE]:
+            if self.shadows.light_sources:
+                self.shadows.remove_light_source(self.shadows.light_sources[0])
 
         self.shadows.render(self.window)
 
