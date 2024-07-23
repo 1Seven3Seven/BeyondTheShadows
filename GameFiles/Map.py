@@ -61,7 +61,7 @@ class Map:
 
                 tile_str = f"{tile_x},{tile_y}"
 
-                if tile_str not in self.tiles:
+                if tile_str in self.tiles:
                     rectangles.append(self.tiles[tile_str])
 
         return rectangles
