@@ -27,7 +27,7 @@ class Entity(ABC):
 
         self.rect.x += x
 
-        for rect in map_.surrounding_tiles(self.rect.x, self.rect.y):
+        for rect in map_.surrounding_tiles(self.rect.centerx, self.rect.centery):
             if self.rect.colliderect(rect):
                 if x > 0:
                     self.rect.right = rect.left
@@ -45,7 +45,7 @@ class Entity(ABC):
 
         self.rect.y += y
 
-        for rect in map_.surrounding_tiles(self.rect.x, self.rect.y):
+        for rect in map_.surrounding_tiles(self.rect.centerx, self.rect.centery):
             if self.rect.colliderect(rect):
                 if self.rect.colliderect(rect):
                     if y > 0:
