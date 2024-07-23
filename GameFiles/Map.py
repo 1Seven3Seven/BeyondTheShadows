@@ -39,8 +39,8 @@ class Map:
         Given a position, return all tiles that exist surrounding it.
         """
 
-        tile_x_base = x // self.TILE_SIZE
-        tile_y_base = y // self.TILE_SIZE
+        tile_x_base = int(x // self.TILE_SIZE)
+        tile_y_base = int(y // self.TILE_SIZE)
 
         rectangles = []
         for x_diff in range(-1, 2):
