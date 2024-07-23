@@ -11,6 +11,7 @@ from .PotionHandler import PotionHandler
 
 class Player(Entity):
     ATTACK_DELAY = 30
+    THROW_VELOCITY = 12
 
     def __init__(self):
         super().__init__(300, 300, 50, 50, 100)
@@ -30,7 +31,7 @@ class Player(Entity):
 
         # Create a potion thrown in that direction
         potion_handler.potions.append(
-            Potion(self.rect.centerx, self.rect.centery, angle, 12)
+            Potion(self.rect.centerx, self.rect.centery, angle, self.THROW_VELOCITY)
         )
 
         self.attack_delay = self.ATTACK_DELAY
