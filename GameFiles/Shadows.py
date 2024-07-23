@@ -85,11 +85,11 @@ class Shadows:
         """
 
         # Convert the position into a tile
-        base_tile_x = light_source.x // self.TILE_SIZE
-        base_tile_y = light_source.y // self.TILE_SIZE
+        base_tile_x = int(light_source.x // self.TILE_SIZE)
+        base_tile_y = int(light_source.y // self.TILE_SIZE)
 
         # Convert the radius into tile sizes
-        light_radius_tiles = light_source.radius // self.TILE_SIZE + 1
+        light_radius_tiles = int(light_source.radius // self.TILE_SIZE) + 1
 
         # Square the light radius
         light_radius_squared = light_source.radius * light_source.radius
