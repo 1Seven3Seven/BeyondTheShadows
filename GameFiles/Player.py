@@ -19,18 +19,18 @@ class Player(Entity):
     def move(self, keys: pygame.key.ScancodeWrapper, map_: Map):
         y_movement = 0
 
-        if keys[pygame.K_UP]:
+        if keys[pygame.K_UP] or keys[pygame.K_w]:
             y_movement -= 3
-        if keys[pygame.K_DOWN]:
+        if keys[pygame.K_DOWN] or keys[pygame.K_s]:
             y_movement += 3
 
         self.move_y(map_, y_movement)
 
         x_movement = 0
 
-        if keys[pygame.K_LEFT]:
+        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
             x_movement -= 3
-        if keys[pygame.K_RIGHT]:
+        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             x_movement += 3
 
         self.move_x(map_, x_movement)
