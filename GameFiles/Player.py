@@ -27,7 +27,8 @@ class Player(Entity):
             return
 
         # Get the angle from the player center to the mouse
-        angle = math.atan2(mouse_state["position"][1] - self.rect.y, mouse_state["position"][0] - self.rect.x)
+        angle = math.atan2(mouse_state["position"][1] - self.rect.centery,
+                           mouse_state["position"][0] - self.rect.centerx)
 
         # Create a potion thrown in that direction
         potion_handler.potions.append(
