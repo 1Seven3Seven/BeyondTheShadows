@@ -90,6 +90,39 @@ class Map:
 
         return rectangles
 
+    def tiles_touching(self, rect: pygame.Rect) -> list[pygame.Rect]:
+        """
+        Given a rectangle, return all tiles that exist touching it.
+
+        Might not work properly if the right or bottom is a negative number.
+        """
+
+        tile_x_min = int(rect.left // self.TILE_SIZE)
+        tile_x_max = int(rect.right // self.TILE_SIZE) + 1
+
+        if tile_x_min < 0:
+            tile_x_min = 0
+        if tile_x_max >= self.width:
+            tile_x_max = self.width
+
+        tile_y_min = int(rect.top // self.TILE_SIZE)
+        tile_y_max = int(rect.bottom // self.TILE_SIZE) + 1
+
+        if tile_y_max >= self.height:
+            tile_y_max = self.height
+        if tile_y_min < 0:
+            tile_y_min = 0
+
+        rectangles = []
+        for tile_x in range(tile_x_min, tile_x_max):
+            for tile_y in range(tile_y_min, tile_y_max):
+                tile_str = f"{tile_x},{tile_y}"
+
+                if tile_str in self.tiles:
+                    rectangles.append(self.tiles[tile_str])
+
+        return rectangles
+
     def draw(self, camera: Camera):
         for tile_rect in self.tiles.values():
             if not camera.can_see(tile_rect):
