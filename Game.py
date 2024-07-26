@@ -31,6 +31,7 @@ class Game:
         self.potion_handler: GameFiles.PotionHandler = GameFiles.PotionHandler()
 
         self.camera: GameFiles.Camera = GameFiles.Camera(self.window)
+        self.camera.set_min_max_position(*self.map.min_max_positions())
 
     def step(self):
         for event in pygame.event.get():
