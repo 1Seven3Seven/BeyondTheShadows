@@ -1,5 +1,6 @@
 import pygame
 
+from .Camera import Camera
 from .MapData import MapData
 
 
@@ -65,3 +66,13 @@ class Map:
                     rectangles.append(self.tiles[tile_str])
 
         return rectangles
+
+    def draw(self, camera: Camera):
+        for tile_rect in self.tiles.values():
+            if not camera.can_see(tile_rect):
+                continue
+
+            display_rect = tile_rect.copy()
+            camera.convert_rect_to_camera_coordinates(display_rect)
+
+            pygame.draw.rect(camera.window, (255, 127, 127), display_rect)
