@@ -3,6 +3,7 @@ from typing import Generator
 
 import pygame
 
+from .Camera import Camera
 from .LightSource import LightSource
 
 
@@ -136,8 +137,9 @@ class Shadows:
         for affected_tile, _ in self._tiles_affected_by(light_source):
             affected_tile.remove_light_source(light_source)
 
-    def render(self, surface: pygame.Surface) -> None:
+    def render(self, camera: Camera) -> None:
         tile_surface = pygame.Surface((self.TILE_SIZE, self.TILE_SIZE))
+        tile_rect = tile_surface.get_rect()
 
         for tile_x in range(self.width):
             tile_x_position = tile_x * self.TILE_SIZE
@@ -145,8 +147,14 @@ class Shadows:
             for tile_y in range(self.height):
                 tile_y_position = tile_y * self.TILE_SIZE
 
-                tile = self.tiles[tile_y][tile_x]
+                tile_rect.topleft = tile_x_position, tile_y_position
 
-                tile_surface.fill((tile.darkness, tile.darkness, tile.darkness))
+                if not camera.can_see(tile_rect):
+                    continue
 
-                surface.blit(tile_surface, (tile_x_position, tile_y_position), special_flags=pygame.BLEND_RGB_SUB)
+                camera.convert_rect_to_camera_coordinates(tile_rect)
+
+                tile_darkness = self.tiles[tile_y][tile_x].darkness
+                tile_surface.fill((tile_darkness, tile_darkness, tile_darkness))
+
+                camera.window.blit(tile_surface, tile_rect, special_flags=pygame.BLEND_RGB_SUB)
