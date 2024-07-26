@@ -30,6 +30,8 @@ class Game:
 
         self.potion_handler: GameFiles.PotionHandler = GameFiles.PotionHandler()
 
+        self.camera: GameFiles.Camera = GameFiles.Camera(self.window)
+
     def step(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -51,24 +53,25 @@ class Game:
         self.player.move(keys, self.map)
         self.player.update(keys, mouse_state, self.potion_handler)
 
-        self.player.draw(self.window)
+        self.camera.center_on(self.player.rect)
 
-        for tile_rect in self.map.tiles.values():
-            pygame.draw.rect(self.window, (255, 127, 127), tile_rect)
+        self.player.draw(self.camera)
 
-        self.potion_handler.draw(self.window)
+        self.map.draw(self.camera)
+
+        self.potion_handler.draw(self.camera)
 
         for enemy in self.enemies:
             enemy.update(self.player)
             enemy.move(self.map)
 
-            enemy.draw(self.window)
+            enemy.draw(self.camera)
 
         if keys[pygame.K_BACKSPACE]:
             if self.shadows.light_sources:
                 self.shadows.remove_light_source(self.shadows.light_sources[0])
 
-        self.shadows.render(self.window)
+        self.shadows.render(self.camera)
 
         pygame.display.flip()
 
