@@ -42,7 +42,7 @@ class MapData:
             yield self.tiles[y]
 
     @staticmethod
-    def next_data(file: TextIO) -> str:
+    def next_line_with_data(file: TextIO) -> str:
         """Get the next line containing data in the file."""
 
         for line in file:
@@ -57,11 +57,11 @@ class MapData:
             return line
 
     @classmethod
-    def data(cls, file: TextIO) -> Generator[str, None, None]:
+    def lines_with_data(cls, file: TextIO) -> Generator[str, None, None]:
         """Iterate over each line of data in the file."""
 
         while True:
-            line = cls.next_data(file)
+            line = cls.next_line_with_data(file)
 
             if line is None:
                 break
@@ -69,18 +69,53 @@ class MapData:
             yield line
 
     @classmethod
-    def read_width_height(cls, file: TextIO) -> tuple[int, int]:
+    def read_map_dimensions(cls, file: TextIO) -> tuple[int, int]:
         """
         Reads the width and height of the map data from the file.
 
         Assumes that the file has not been read from yet.
         """
 
-        line = cls.next_data(file)
+        line = cls.next_line_with_data(file)
 
-        width, height = line.split(",")
+        if line != "DIMENSIONS":
+            raise ValueError(f"Expected 'DIMENSIONS' but got '{line}'")
+
+        line = cls.next_line_with_data(file)
+
+        try:
+            width, height = line.split(",")
+        except ValueError:
+            raise ValueError(f"Expected 'WIDTH,HEIGHT' but got '{line}'")
 
         return int(width), int(height)
+
+    @classmethod
+    def read_map_tile_data_into(cls, file: TextIO, empty_map_data: "MapData") -> None:
+        """
+        Reads the tile data of the map from the file into the given map data object.
+        Uses the width and height already in the object.
+        """
+
+        line = cls.next_line_with_data(file)
+
+        if line != "TILE_DATA":
+            raise ValueError(f"Expected 'TILE_DATA' but got '{line}'")
+
+        row_index = 0  # Preventing pycharm from yelling at me
+        for row_index in range(empty_map_data.height):
+            line = cls.next_line_with_data(file)
+
+            if len(line) != empty_map_data.width:
+                raise ValueError(f"Data width {len(line)} does not match expected width {empty_map_data.width}.")
+
+            for column_index in range(empty_map_data.width):
+                empty_map_data.tiles[row_index][column_index] = int(line[column_index])
+
+        row_index += 1
+
+        if row_index != empty_map_data.height:
+            raise ValueError(f"Data height {row_index} does not match expected height {empty_map_data.height}.")
 
     @classmethod
     def from_file(cls, path: pathlib.Path) -> "MapData":
@@ -98,20 +133,14 @@ class MapData:
 
         with path.open() as file:
             # Generate an empty map data object
-            map_data = cls(*cls.read_width_height(file))
+            map_data = cls(*cls.read_map_dimensions(file))
 
-            # Fill the map data from the file
-            for i, data in enumerate(cls.data(file)):
-                if len(data) != map_data.width:
-                    raise ValueError(f"Data width {len(data)} does not match expected width {map_data.width}.")
+            # Fill the map data object with, well, map data
+            cls.read_map_tile_data_into(file, map_data)
 
-                for j, tile in enumerate(data):
-                    map_data.tiles[i][j] = int(tile)
-
-        i += 1
-
-        if i != map_data.height:
-            raise ValueError(f"Data height {i} does not match expected height {map_data.height}.")
+            # ToDo: continue reading the file for any optional entries
+            # ToDo: create the optional entries to read
+            # Those should probably be the other way around, but ehh
 
         return map_data
 
@@ -120,6 +149,7 @@ def main():
     map_data = MapData.from_file(pathlib.Path("Maps/test.mapdata"))
 
     print(map_data)
+    print()
     print(map_data.__str__(pretty=True))
 
 
