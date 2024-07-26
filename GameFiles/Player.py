@@ -2,6 +2,7 @@ import math
 
 import pygame
 
+from .Camera import Camera
 from .Entity import Entity
 from .Helpers import MouseSate
 from .Map import Map
@@ -17,6 +18,7 @@ class Player(Entity):
         super().__init__(300, 300, 50, 50, 100)
 
         self.attack_delay = self.ATTACK_DELAY
+        self.display_rect: pygame.Rect = self.rect.copy()
 
     def _update_attack(self, keys: pygame.key.ScancodeWrapper, mouse_state: MouseSate, potion_handler: PotionHandler):
         if self.attack_delay > 0:
@@ -27,8 +29,8 @@ class Player(Entity):
             return
 
         # Get the angle from the player center to the mouse
-        angle = math.atan2(mouse_state["position"][1] - self.rect.centery,
-                           mouse_state["position"][0] - self.rect.centerx)
+        angle = math.atan2(mouse_state["position"][1] - self.display_rect.centery,
+                           mouse_state["position"][0] - self.display_rect.centerx)
 
         # Create a potion thrown in that direction
         potion_handler.potions.append(
@@ -59,5 +61,11 @@ class Player(Entity):
 
         self.move_x(map_, x_movement)
 
-    def draw(self, surface: pygame.Surface):
-        pygame.draw.rect(surface, (255, 255, 255), self.rect)
+    def draw(self, camera: Camera):
+        if not camera.can_see(self.rect):
+            return
+
+        self.display_rect.topleft = self.rect.topleft
+        camera.convert_rect_to_camera_coordinates(self.display_rect)
+
+        pygame.draw.rect(camera.window, (255, 255, 255), self.display_rect)

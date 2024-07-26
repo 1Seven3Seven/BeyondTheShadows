@@ -1,9 +1,9 @@
-import math
 import random
 from dataclasses import dataclass
 
 import pygame
 
+from .Camera import Camera
 from .Entity import Entity
 from .Map import Map
 from .Player import Player
@@ -45,6 +45,8 @@ class BasicEnemy(Entity):
         self.circle_timer = CIRCLE_SPAWN_DELAY
 
         self.sprite = pygame.surface.Surface((self.rect.w + CIRCLE_RADIUS * 4, self.rect.h + CIRCLE_RADIUS * 4))
+        self.sprite_rect = self.sprite.get_rect()
+
         self.sub_sprite = pygame.surface.Surface((CIRCLE_RADIUS * 2 + 1, CIRCLE_RADIUS * 2 + 1))
         self.sub_sprite_rect = self.sub_sprite.get_rect()
 
@@ -132,8 +134,9 @@ class BasicEnemy(Entity):
         self.move_x(map_, x_move)
         self.move_y(map_, y_move)
 
-    def draw(self, surface: pygame.Surface):
+    def _render_sprite(self):
         self.sprite.fill((0, 0, 0))
+
         for circle in self.circles:
             self.sub_sprite.fill((0, 0, 0))
             pygame.draw.circle(self.sub_sprite, (10, 10, 10),
@@ -143,12 +146,13 @@ class BasicEnemy(Entity):
             self.sub_sprite_rect.center = circle.x, circle.y
             self.sprite.blit(self.sub_sprite, self.sub_sprite_rect, special_flags=pygame.BLEND_RGB_ADD)
 
-        sprite_rect = self.sprite.get_rect()
-        sprite_rect.center = self.rect.center
+    def draw(self, camera: Camera):
+        self.sprite_rect.center = self.rect.center
 
-        surface.blit(self.sprite, sprite_rect.topleft, special_flags=pygame.BLEND_RGB_SUB)
+        if not camera.can_see(self.sprite_rect):
+            return
 
-        pygame.draw.rect(surface, (255, 255, 255), sprite_rect, width=1)
-        pygame.draw.rect(surface, (255, 255, 255), self.rect, width=1)
+        self._render_sprite()
+        camera.convert_rect_to_camera_coordinates(self.sprite_rect)
 
-        pygame.draw.circle(surface, (255, 0, 0), self.target, 5)
+        camera.window.blit(self.sprite, self.sprite_rect.topleft, special_flags=pygame.BLEND_RGB_SUB)

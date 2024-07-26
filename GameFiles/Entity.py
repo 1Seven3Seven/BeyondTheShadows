@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 import pygame
 
 from .Map import Map
+from .Camera import Camera
 
 
 class Entity(ABC):
@@ -59,5 +60,5 @@ class Entity(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def draw(self, surface: pygame.Surface) -> None:
+    def draw(self, camera: Camera) -> None:
         raise NotImplementedError
