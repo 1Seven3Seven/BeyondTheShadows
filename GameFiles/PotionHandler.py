@@ -1,7 +1,6 @@
 from typing import Generator
 
-import pygame
-
+from .Camera import Camera
 from .Map import Map
 from .Potion import Potion
 from .Shadows import Shadows
@@ -23,6 +22,6 @@ class PotionHandler:
 
             potion.update(map_, enemies, shadows)
 
-    def draw(self, surface: pygame.Surface) -> None:
+    def draw(self, camera: Camera) -> None:
         for potion in self.potions:
-            potion.draw(surface)
+            potion.draw(camera)

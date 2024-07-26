@@ -2,6 +2,7 @@ import math
 
 import pygame
 
+from .Camera import Camera
 from .LightSource import LightSource
 from .Map import Map
 from .Shadows import Shadows
@@ -60,8 +61,10 @@ class Potion:
             if rect.collidepoint(self.x, self.y):
                 self.explode(shadows)
 
-    def draw(self, screen: pygame.Surface) -> None:
+    def draw(self, camera: Camera) -> None:
         # ToDo: draw the potion
         # A glowing circle will be good enough
 
-        pygame.draw.circle(screen, (0, 255, 0), (self.x, self.y), 10)
+        display_coords = camera.coordinates_to_display_coordinates((self.x, self.y))
+
+        pygame.draw.circle(camera.window, (0, 255, 0), display_coords, 10)
