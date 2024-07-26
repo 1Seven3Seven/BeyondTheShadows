@@ -1,7 +1,18 @@
-# Width and height
+# The map data
+# Sections are headed by an all caps key
+# This dictates what to read
+# After a section has been read, the next key should be found
+# The DIMENSIONS should always come before the TILE_DATA
+# Then after that is a bunch of optional keys
+
+DIMENSIONS
+# States the width and height of the map
 15,10
+
+TILE_DATA
 # The map data itself
 # A series of boolean values for if a tile exists or not
+# Should have the same width and height as stated in DIMENSIONS
 111111111111111
 100010110001001
 100010011101101
