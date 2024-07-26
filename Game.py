@@ -19,9 +19,9 @@ class Game:
             GameFiles.BasicEnemy(200, 200)
         ]
 
-        self.map: GameFiles.Map = GameFiles.Map(
-            GameFiles.MapData.from_file(pathlib.Path("GameFiles/Maps/test.mapdata"))
-        )
+        self.map_data: GameFiles.MapData = GameFiles.MapData.from_file(pathlib.Path("GameFiles/Maps/test.mapdata"))
+
+        self.map: GameFiles.Map = GameFiles.Map(self.map_data)
 
         self.shadows: GameFiles.Shadows = GameFiles.Shadows(
             self.map.width * self.map.TILE_SIZE // GameFiles.Shadows.TILE_SIZE,
