@@ -18,6 +18,15 @@ class Map:
         self.height: int = 0
         """The height in map tiles."""
 
+        self.min_x: int = 0
+        """The minimum x coordinate that exists within the map tiles."""
+        self.max_x: int = 0
+        """The maximum x coordinate that exists within the map tiles."""
+        self.min_y: int = 0
+        """The minimum y coordinate that exists within the map tiles."""
+        self.max_y: int = 0
+        """The maximum y coordinate that exists within the map tiles."""
+
         if map_data is not None:
             self.generate_from(map_data)
 
@@ -34,6 +43,11 @@ class Map:
 
         self.width = map_data.width
         self.height = map_data.height
+
+        self.min_x = 0
+        self.max_x = self.TILE_SIZE * self.width
+        self.min_y = 0
+        self.max_y = self.TILE_SIZE * self.height
 
     def surrounding_tiles(self, x: int, y: int) -> list[pygame.Rect]:
         """
