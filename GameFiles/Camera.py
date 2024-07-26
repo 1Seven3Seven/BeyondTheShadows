@@ -6,8 +6,15 @@ _Coords = tuple[int | float, int | float]
 class Camera:
     def __init__(self, window: pygame.Surface):
         self.window = window
+        """The surface to be drawn to."""
 
         self.rect = self.window.get_rect()
+        """The cameras size and location in the world."""
+
+        self.width_2: int = int(self.rect.width // 2)
+        """Half of the window width."""
+        self.height_2: int = int(self.rect.height // 2)
+        """Half of the window height."""
 
     def center_on(self, rect: pygame.Rect):
         self.rect.center = rect.center
