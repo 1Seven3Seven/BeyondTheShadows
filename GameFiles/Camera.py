@@ -16,8 +16,37 @@ class Camera:
         self.height_2: int = int(self.rect.height // 2)
         """Half of the window height."""
 
+        self.x_min: int | float = float("-inf")
+        """The minimum x coordinate of the camera."""
+        self.x_max: int | float = float("inf")
+        """The maximum x coordinate of the camera."""
+        self.y_min: int | float = float("-inf")
+        """The minimum y coordinate of the camera."""
+        self.y_max: int | float = float("inf")
+        """The maximum y coordinate of the camera."""
+
+    def set_min_max_position(self,
+                             x_min: int | float, x_max: int | float,
+                             y_min: int | float, y_max: int | float) -> None:
+        """Sets the minimum and maximum coordinates of the camera."""
+
+        self.x_min = x_min
+        self.x_max = x_max
+        self.y_min = y_min
+        self.y_max = y_max
+
     def center_on(self, rect: pygame.Rect):
         self.rect.center = rect.center
+
+        if self.rect.left < self.x_min:
+            self.rect.left = self.x_min
+        elif self.rect.right > self.x_max:
+            self.rect.right = self.x_max
+
+        if self.rect.top < self.y_min:
+            self.rect.top = self.y_min
+        elif self.rect.bottom > self.y_max:
+            self.rect.bottom = self.y_max
 
     def coordinates_to_display_coordinates(self, coords: _Coords) -> _Coords:
         """
