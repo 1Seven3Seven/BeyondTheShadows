@@ -74,7 +74,21 @@ class ParticleHandler:
         else:
             sprite_size = particle_data["SIZE"] * 2
 
+        colour = particle_data["COLOUR"]
+
         sprite = pygame.Surface((sprite_size, sprite_size))
+
+        # Set the colour key to something different to the sprite colour
+        temp_colour = ((colour[0] + 1) % 256, colour[1], colour[2])
+        sprite.fill(temp_colour)
+        sprite.set_colorkey(temp_colour)
+
+        if particle_data["IS_SQUARE"]:
+            sprite.fill(colour)
+        else:
+            sprite_size_2 = int(sprite_size // 2)
+            pygame.draw.circle(sprite, colour, (sprite_size_2, sprite_size_2), int(sprite_size // 2))
+
         key = particle_data["KEY"]
 
         particle_entry: dict[_ParticleEntryKeys, Any] = {
