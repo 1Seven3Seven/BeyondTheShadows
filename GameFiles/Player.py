@@ -6,8 +6,8 @@ from .Camera import Camera
 from .Entity import Entity
 from .Helpers import MouseSate
 from .Map import Map
-from .Potion import Potion
 from .PotionHandler import PotionHandler
+from .Shadows import Shadows
 
 
 class Player(Entity):
@@ -20,7 +20,8 @@ class Player(Entity):
         self.attack_delay = self.ATTACK_DELAY
         self.display_rect: pygame.Rect = self.rect.copy()
 
-    def _update_attack(self, keys: pygame.key.ScancodeWrapper, mouse_state: MouseSate, potion_handler: PotionHandler):
+    def _update_attack(self, keys: pygame.key.ScancodeWrapper, mouse_state: MouseSate,
+                       potion_handler: PotionHandler, shadows: Shadows):
         if self.attack_delay > 0:
             self.attack_delay -= 1
             return
@@ -33,14 +34,13 @@ class Player(Entity):
                            mouse_state["position"][0] - self.display_rect.centerx)
 
         # Create a potion thrown in that direction
-        potion_handler.potions.append(
-            Potion(self.rect.centerx, self.rect.centery, angle, self.THROW_VELOCITY)
-        )
+        potion_handler.create_potion(self.rect.center, angle, self.THROW_VELOCITY, shadows)
 
         self.attack_delay = self.ATTACK_DELAY
 
-    def update(self, keys: pygame.key.ScancodeWrapper, mouse_state: MouseSate, potion_handler: PotionHandler):
-        self._update_attack(keys, mouse_state, potion_handler)
+    def update(self, keys: pygame.key.ScancodeWrapper, mouse_state: MouseSate,
+               potion_handler: PotionHandler, shadows: Shadows):
+        self._update_attack(keys, mouse_state, potion_handler, shadows)
 
     def move(self, keys: pygame.key.ScancodeWrapper, map_: Map):
         y_movement = 0
