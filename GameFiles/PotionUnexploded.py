@@ -8,11 +8,11 @@ from .Map import Map
 from .Shadows import Shadows
 
 
-class Potion:
-    brightness: int = 300
-    radius: int = 128
+class PotionUnexploded:
+    BRIGHTNESS: int = 300
+    RADIUS: int = 128
 
-    def __init__(self, x: int | float, y: int | float, angle: float, velocity: int | float):
+    def __init__(self, x: int | float, y: int | float, angle: float, velocity: int | float, shadows: Shadows):
         """
         :param x: The initial x position of the potion.
         :param y: The initial y position of the potion.
@@ -32,12 +32,14 @@ class Potion:
         self.exploded: bool = False
         """If true, then this potion has exploded and should be removed."""
 
+        self.light_source: LightSource | None = LightSource(
+            self.x, self.y, 255, 48
+        )
+        shadows.add_light_source(self.light_source)
+
     def explode(self, shadows: Shadows) -> None:
         self.exploded = True
-
-        shadows.add_light_source(
-            LightSource(self.x, self.y, self.brightness, self.radius)
-        )
+        shadows.remove_light_source(self.light_source)
 
     def update(self, map_: Map, enemies: list, shadows: Shadows) -> None:
         # ToDo: add collision with enemies
@@ -55,6 +57,13 @@ class Potion:
         self.x += self.vx * self.velocity
         self.y += self.vy * self.velocity
         self.velocity -= 1
+
+        shadows.remove_light_source(self.light_source)
+
+        self.light_source.x = self.x
+        self.light_source.y = self.y
+
+        shadows.add_light_source(self.light_source)
 
         # Check for collisions with tiles
         for rect in map_.surrounding_tiles(self.x, self.y):

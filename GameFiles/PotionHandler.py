@@ -2,26 +2,52 @@ from typing import Generator
 
 from .Camera import Camera
 from .Map import Map
-from .Potion import Potion
+from .PotionExploded import PotionExploded
+from .PotionUnexploded import PotionUnexploded
 from .Shadows import Shadows
 
 
 class PotionHandler:
     def __init__(self):
-        self.potions: list[Potion] = []
+        self.unexploded_potions: list[PotionUnexploded] = []
+        self.exploded_potions: list[PotionExploded] = []
 
-    def iter_potions_reverse(self) -> Generator[tuple[int, Potion], None, None]:
-        for i in range(len(self.potions) - 1, -1, -1):
-            yield i, self.potions[i]
+    @staticmethod
+    def iter_potions_reverse(potion_list: list[PotionUnexploded | PotionExploded]) \
+            -> Generator[tuple[int, PotionUnexploded | PotionExploded], None, None]:
+        for i in range(len(potion_list) - 1, -1, -1):
+            yield i, potion_list[i]
 
     def update(self, map_: Map, enemies: list, shadows: Shadows) -> None:
-        for i, potion in self.iter_potions_reverse():
-            if potion.exploded:
-                del self.potions[i]
+        potion_unexploded: PotionUnexploded
+        for i, potion_unexploded in self.iter_potions_reverse(self.unexploded_potions):
+            if potion_unexploded.exploded:
+                self._create_potion_exploded(potion_unexploded, shadows)
+
+                del self.unexploded_potions[i]
                 continue
 
-            potion.update(map_, enemies, shadows)
+            potion_unexploded.update(map_, enemies, shadows)
+
+        potion_exploded: PotionExploded
+        for i, potion_exploded in self.iter_potions_reverse(self.exploded_potions):
+            potion_exploded.update()
 
     def draw(self, camera: Camera) -> None:
-        for potion in self.potions:
+        for potion in self.unexploded_potions:
             potion.draw(camera)
+
+        for potion in self.exploded_potions:
+            potion.draw(camera)
+
+    def create_potion(self, position: tuple[int | float, int | float],
+                      angle: float, velocity: int | float,
+                      shadows: Shadows) -> None:
+        self.unexploded_potions.append(
+            PotionUnexploded(position[0], position[1], angle, velocity, shadows)
+        )
+
+    def _create_potion_exploded(self, potion: PotionUnexploded, shadows: Shadows) -> None:
+        self.exploded_potions.append(
+            PotionExploded(potion.x, potion.y, shadows)
+        )
