@@ -24,6 +24,8 @@ class Particle:
         self.lifespan -= 1
 
     def draw(self, camera: Camera) -> None:
+        self.sprite_rect.center = self.x, self.y
+
         if not camera.can_see(self.sprite_rect):
             return
 
