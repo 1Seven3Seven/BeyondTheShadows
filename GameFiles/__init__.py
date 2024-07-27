@@ -2,6 +2,8 @@ from . import Helpers
 
 from .Camera import Camera
 
+from .ParticleHandler import ParticleHandler
+
 from .MapData import MapData
 from .Map import Map
 
