@@ -2,6 +2,7 @@ from typing import Generator
 
 from .Camera import Camera
 from .Map import Map
+from .ParticleHandler import ParticleHandler
 from .PotionExploded import PotionExploded
 from .PotionUnexploded import PotionUnexploded
 from .Shadows import Shadows
@@ -18,7 +19,7 @@ class PotionHandler:
         for i in range(len(potion_list) - 1, -1, -1):
             yield i, potion_list[i]
 
-    def update(self, map_: Map, enemies: list, shadows: Shadows) -> None:
+    def update(self, map_: Map, enemies: list, shadows: Shadows, particle_handler: ParticleHandler) -> None:
         potion_unexploded: PotionUnexploded
         for i, potion_unexploded in self.iter_potions_reverse(self.unexploded_potions):
             if potion_unexploded.exploded:
@@ -27,11 +28,11 @@ class PotionHandler:
                 del self.unexploded_potions[i]
                 continue
 
-            potion_unexploded.update(map_, enemies, shadows)
+            potion_unexploded.update(map_, enemies, shadows, particle_handler)
 
         potion_exploded: PotionExploded
         for i, potion_exploded in self.iter_potions_reverse(self.exploded_potions):
-            potion_exploded.update()
+            potion_exploded.update(particle_handler)
 
     def draw(self, camera: Camera) -> None:
         for potion in self.unexploded_potions:

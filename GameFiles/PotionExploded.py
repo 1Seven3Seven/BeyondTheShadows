@@ -1,7 +1,11 @@
+import math
+import random
+
 import pygame
 
 from .Camera import Camera
 from .LightSource import LightSource
+from .ParticleHandler import ParticleHandler
 from .Shadows import Shadows
 
 
@@ -14,6 +18,10 @@ class PotionExploded:
     """The size of the collision rectangle. Should be even."""
     SIZE_2: int = int(SIZE // 2)
 
+    PARTICLE_SPAWN_TIME: int = 5
+    """The delay in frames between spawning particles."""
+    PARTICLE_LIFESPAN: int = 20
+
     def __init__(self, x: int | float, y: int | float, shadows: Shadows):
         self.x = x
         self.y = y
@@ -25,8 +33,25 @@ class PotionExploded:
         )
         shadows.add_light_source(self.light_source)
 
-    def update(self) -> None:
-        pass
+        self.timer: int = self.PARTICLE_SPAWN_TIME
+
+    def update(self, particle_handler: ParticleHandler) -> None:
+        if self.timer >= 0:
+            self.timer -= 1
+            return
+
+        self.timer = self.PARTICLE_SPAWN_TIME
+
+        angle = random.uniform(0, 2 * math.pi)
+        vx = math.cos(angle)
+        vy = math.sin(angle)
+
+        particle_handler.create_particle(
+            "test",
+            self.x, self.y,
+            vx, vy,
+            self.PARTICLE_LIFESPAN
+        )
 
     def draw(self, camera: Camera) -> None:
         display_coords = camera.coordinates_to_display_coordinates(self.rect.center)

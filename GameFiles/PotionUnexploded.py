@@ -5,6 +5,7 @@ import pygame
 from .Camera import Camera
 from .LightSource import LightSource
 from .Map import Map
+from .ParticleHandler import ParticleHandler
 from .Shadows import Shadows
 
 
@@ -41,7 +42,7 @@ class PotionUnexploded:
         self.exploded = True
         shadows.remove_light_source(self.light_source)
 
-    def update(self, map_: Map, enemies: list, shadows: Shadows) -> None:
+    def update(self, map_: Map, enemies: list, shadows: Shadows, particle_handler: ParticleHandler) -> None:
         # ToDo: add collision with enemies
 
         # Should not occur, but if the potion has collided with something, then do not update
