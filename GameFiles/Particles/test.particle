@@ -22,5 +22,5 @@ SIZE
 
 COLOUR
 # The colour to render this particle as
-# As r,g,b with no spaces
-255,127,64
+# As r,g,b,a with no spaces
+255,127,64,127

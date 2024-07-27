@@ -58,10 +58,10 @@ class ParticleHandler:
                 raise ValueError(f"Expected 'COLOUR', got '{line}'")
             line = next_line_with_data(particle_file)
             try:
-                r, g, b = line.split(",")
-                particle_data["COLOUR"] = int(r), int(g), int(b)
+                r, g, b, a = line.split(",")
+                particle_data["COLOUR"] = int(r), int(g), int(b), int(a)
             except ValueError:
-                raise ValueError(f"Expected line in the format 'r,g,b', got '{line}'")
+                raise ValueError(f"Expected line in the format 'r,g,b,a', got '{line}'")
 
         # Expected type 'dict[Literal["KEY", "SIZE", "IS_SQUARE", "COLOUR"], Any]',
         #  got 'dict[str, str | int | tuple[int, int, int]]' instead
@@ -76,12 +76,7 @@ class ParticleHandler:
 
         colour = particle_data["COLOUR"]
 
-        sprite = pygame.Surface((sprite_size, sprite_size))
-
-        # Set the colour key to something different to the sprite colour
-        temp_colour = ((colour[0] + 1) % 256, colour[1], colour[2])
-        sprite.fill(temp_colour)
-        sprite.set_colorkey(temp_colour)
+        sprite = pygame.Surface((sprite_size, sprite_size), flags=pygame.SRCALPHA)
 
         if particle_data["IS_SQUARE"]:
             sprite.fill(colour)
