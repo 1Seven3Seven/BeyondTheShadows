@@ -13,12 +13,6 @@ class Game:
         self.running = True
         """Is True whilst the game is running."""
 
-        self.player: GameFiles.Player = GameFiles.Player()
-
-        self.enemies = [
-            GameFiles.BasicEnemy(200, 200)
-        ]
-
         self.map_data: GameFiles.MapData = GameFiles.MapData.from_file(pathlib.Path("GameFiles/Maps/test.mapdata"))
 
         self.map: GameFiles.Map = GameFiles.Map(self.map_data)
@@ -28,15 +22,16 @@ class Game:
             self.map.height * self.map.TILE_SIZE // GameFiles.Shadows.TILE_SIZE
         )
 
+        self.player: GameFiles.Player = GameFiles.Player(self.shadows)
+
+        self.enemies = [
+            GameFiles.BasicEnemy(200, 200)
+        ]
+
         self.potion_handler: GameFiles.PotionHandler = GameFiles.PotionHandler()
 
         self.camera: GameFiles.Camera = GameFiles.Camera(self.window)
         self.camera.set_min_max_position(*self.map.min_max_positions())
-
-        # self.light_source: GameFiles.LightSource = GameFiles.LightSource(
-        #     self.player.rect.centerx, self.player.rect.centery,
-        #     255, 64
-        # )
 
     def step(self):
         for event in pygame.event.get():
@@ -75,11 +70,7 @@ class Game:
             if self.shadows.light_sources:
                 self.shadows.remove_light_source(self.shadows.light_sources[0])
 
-        # self.light_source.x = self.player.rect.centerx
-        # self.light_source.y = self.player.rect.centery
-        # self.shadows.add_light_source(self.light_source)
         self.shadows.render(self.camera)
-        # self.shadows.remove_light_source(self.light_source)
 
         pygame.display.flip()
 
