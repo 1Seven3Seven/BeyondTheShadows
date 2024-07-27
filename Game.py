@@ -33,6 +33,11 @@ class Game:
         self.camera: GameFiles.Camera = GameFiles.Camera(self.window)
         self.camera.set_min_max_position(*self.map.min_max_positions())
 
+        # self.light_source: GameFiles.LightSource = GameFiles.LightSource(
+        #     self.player.rect.centerx, self.player.rect.centery,
+        #     255, 64
+        # )
+
     def step(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -57,9 +62,7 @@ class Game:
         self.camera.center_on(self.player.rect)
 
         self.player.draw(self.camera)
-
         self.map.draw(self.camera)
-
         self.potion_handler.draw(self.camera)
 
         for enemy in self.enemies:
@@ -72,7 +75,11 @@ class Game:
             if self.shadows.light_sources:
                 self.shadows.remove_light_source(self.shadows.light_sources[0])
 
+        # self.light_source.x = self.player.rect.centerx
+        # self.light_source.y = self.player.rect.centery
+        # self.shadows.add_light_source(self.light_source)
         self.shadows.render(self.camera)
+        # self.shadows.remove_light_source(self.light_source)
 
         pygame.display.flip()
 
