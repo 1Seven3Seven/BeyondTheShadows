@@ -30,6 +30,9 @@ class Game:
 
         self.potion_handler: GameFiles.PotionHandler = GameFiles.PotionHandler()
 
+        self.particle_handler: GameFiles.ParticleHandler = GameFiles.ParticleHandler()
+        self.particle_handler.add_particle_directory(pathlib.Path("GameFiles/Particles"))
+
         self.camera: GameFiles.Camera = GameFiles.Camera(self.window)
         self.camera.set_min_max_position(*self.map.min_max_positions())
 
@@ -49,7 +52,7 @@ class Game:
         keys = pygame.key.get_pressed()
         mouse_state = GameFiles.Helpers.get_mouse_state()
 
-        self.potion_handler.update(self.map, self.enemies, self.shadows)
+        self.potion_handler.update(self.map, self.enemies, self.shadows, self.particle_handler)
 
         self.player.move(keys, self.map)
         self.player.update(keys, mouse_state, self.potion_handler, self.shadows)
@@ -71,6 +74,8 @@ class Game:
                 self.shadows.remove_light_source(self.shadows.light_sources[0])
 
         self.shadows.render(self.camera)
+
+        self.particle_handler.update_and_draw_particles(self.camera)
 
         pygame.display.flip()
 
