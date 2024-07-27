@@ -123,6 +123,26 @@ class Map:
 
         return rectangles
 
+    def position_in_tile(self, position: tuple[int | float, int | float]) -> bool:
+        """
+        Return true if the given position is inside a tile.
+        """
+
+        tile_str = f"{int(position[0])},{int(position[1])}"
+
+        return tile_str in self.tiles
+
+    def tile_for_position(self, position: tuple[int | float, int | float]) -> pygame.Rect | None:
+        """
+        If the position is inside a tile, return the tile, else return None.
+        """
+
+        tile_str = f"{int(position[0])},{int(position[1])}"
+
+        if tile_str in self.tiles:
+            return self.tiles[tile_str]
+        return None
+
     def draw(self, camera: Camera):
         for tile_rect in self.tiles.values():
             if not camera.can_see(tile_rect):
