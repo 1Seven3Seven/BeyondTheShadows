@@ -1,0 +1,26 @@
+# Data pertaining to a particle
+# Sections are headed by an all caps key
+# The data is in the following lines
+# Currently, these entries must be in the order as seen below
+
+KEY
+# The key to refer to this particle by
+# The entire next line is the key
+#  Including special characters and spaces, ignoring leading and trailing whitespace
+test
+
+IS_SQUARE
+# If the particle is a square or a circle
+# 0 for circle, 1 for square
+0
+
+SIZE
+# The radius of the particle
+# If a circle then this is the radius
+# If a square, then the length of one side
+5
+
+COLOUR
+# The colour to render this particle as
+# As r,g,b with no spaces
+255,127,64
