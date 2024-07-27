@@ -1,6 +1,8 @@
 import pathlib
 from typing import Generator, TextIO
 
+from .Helpers.FileReading import next_line_with_data
+
 
 class MapData:
     def __init__(self, width: int, height: int):
@@ -41,33 +43,6 @@ class MapData:
         for y in range(self.height):
             yield self.tiles[y]
 
-    @staticmethod
-    def next_line_with_data(file: TextIO) -> str:
-        """Get the next line containing data in the file."""
-
-        for line in file:
-            line = line.strip()
-
-            if not line:
-                continue
-
-            if line.startswith("#"):
-                continue
-
-            return line
-
-    @classmethod
-    def lines_with_data(cls, file: TextIO) -> Generator[str, None, None]:
-        """Iterate over each line of data in the file."""
-
-        while True:
-            line = cls.next_line_with_data(file)
-
-            if line is None:
-                break
-
-            yield line
-
     @classmethod
     def read_map_dimensions(cls, file: TextIO) -> tuple[int, int]:
         """
@@ -76,12 +51,12 @@ class MapData:
         Assumes that the file has not been read from yet.
         """
 
-        line = cls.next_line_with_data(file)
+        line = next_line_with_data(file)
 
         if line != "DIMENSIONS":
             raise ValueError(f"Expected 'DIMENSIONS' but got '{line}'")
 
-        line = cls.next_line_with_data(file)
+        line = next_line_with_data(file)
 
         try:
             width, height = line.split(",")
@@ -97,14 +72,14 @@ class MapData:
         Uses the width and height already in the object.
         """
 
-        line = cls.next_line_with_data(file)
+        line = next_line_with_data(file)
 
         if line != "TILE_DATA":
             raise ValueError(f"Expected 'TILE_DATA' but got '{line}'")
 
         row_index = 0  # Preventing pycharm from yelling at me
         for row_index in range(empty_map_data.height):
-            line = cls.next_line_with_data(file)
+            line = next_line_with_data(file)
 
             if len(line) != empty_map_data.width:
                 raise ValueError(f"Data width {len(line)} does not match expected width {empty_map_data.width}.")
