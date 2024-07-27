@@ -10,7 +10,7 @@ from .Entity import Entity
 from .LightSource import LightSource
 from .Shadows import Shadows
 
-from .Potion import Potion
+from .PotionUnexploded import PotionUnexploded
 from .PotionHandler import PotionHandler
 
 from .Player import Player
