@@ -52,6 +52,7 @@ class Game:
         self.window.fill((127, 127, 127))
 
         keys = pygame.key.get_pressed()
+        keys_just_pressed = pygame.key.get_just_pressed()
         mouse_state = GameFiles.Helpers.get_mouse_state()
 
         self.potion_handler.update(self.map, self.enemy_handler.enemies, self.shadows, self.particle_handler)
@@ -60,6 +61,9 @@ class Game:
         self.player.update(keys, mouse_state, self.potion_handler, self.shadows)
 
         self.camera.center_on(self.player.rect)
+
+        if keys_just_pressed[pygame.K_SPACE]:
+            GameFiles.PotionExploded.increase_light_radius()
 
         self.player.draw(self.camera)
         self.map.draw(self.camera)
