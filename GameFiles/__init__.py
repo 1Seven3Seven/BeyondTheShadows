@@ -19,3 +19,6 @@ from .PotionHandler import PotionHandler
 from .Player import Player
 
 from .BasicEnemy import BasicEnemy
+from .EnemyStalker import EnemyStalker
+
+from .EnemyHandler import EnemyHandler
