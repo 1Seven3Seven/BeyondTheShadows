@@ -20,5 +20,7 @@ from .Player import Player
 
 from .BasicEnemy import BasicEnemy
 from .EnemyStalker import EnemyStalker
+from .EnemyConsumer import EnemyConsumer
+from .EnemyDarkling import EnemyDarkling
 
 from .EnemyHandler import EnemyHandler
