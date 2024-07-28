@@ -63,7 +63,7 @@ class Map:
         self.y_min = 0
         self.y_max = self.TILE_SIZE * self.height
 
-    def _iter_surrounding_tile_keys(self, x: Number, y: Number) -> Generator[_TileKey, None, None]:
+    def iter_surrounding_tile_keys(self, x: Number, y: Number) -> Generator[_TileKey, None, None]:
         """
         Iterates over the tile keys surrounding the given coordinates.
         Ignores any outside of the map.
