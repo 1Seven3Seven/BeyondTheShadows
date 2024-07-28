@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import pygame
 
 from .Camera import Camera
-from .Entity import Entity
+from .Enemy import Enemy
 from .Map import Map
 from .Player import Player
 
@@ -32,7 +32,7 @@ class Circle:
         self.radius -= CIRCLE_RADIUS_10
 
 
-class BasicEnemy(Entity):
+class BasicEnemy(Enemy):
     def __init__(self, x: int, y: int):
         super().__init__(x, y, 50, 50, 100)
 
@@ -94,7 +94,7 @@ class BasicEnemy(Entity):
                    CIRCLE_RADIUS)
         )
 
-    def update(self, player: Player):
+    def update(self, player: Player, *_):
         self._update_target(player)
         self._update_sprite()
 
