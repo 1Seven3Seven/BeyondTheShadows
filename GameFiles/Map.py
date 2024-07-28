@@ -3,6 +3,7 @@ from typing import Generator
 import pygame
 
 from .Camera import Camera
+from .Helpers.CommonTypes import Coordinates, Number
 from .MapData import MapData
 
 _TileKey = tuple[int, int]
@@ -62,7 +63,7 @@ class Map:
         self.y_min = 0
         self.y_max = self.TILE_SIZE * self.height
 
-    def _iter_surrounding_tile_keys(self, x: int, y: int) -> Generator[_TileKey, None, None]:
+    def _iter_surrounding_tile_keys(self, x: Number, y: Number) -> Generator[_TileKey, None, None]:
         """
         Iterates over the tile keys surrounding the given coordinates.
         Ignores any outside of the map.
@@ -92,7 +93,7 @@ class Map:
             for tile_y in range(tile_y_min, tile_y_max):
                 yield tile_x, tile_y
 
-    def surrounding_tile_keys(self, x: int, y: int) -> list[_TileKey]:
+    def surrounding_tile_keys(self, x: Number, y: Number) -> list[_TileKey]:
         """
         Given a position, return all the keys for tiles that exist surrounding it.
         """
@@ -104,7 +105,7 @@ class Map:
 
         return tile_keys
 
-    def surrounding_tiles(self, x: int, y: int) -> list[pygame.Rect]:
+    def surrounding_tiles(self, x: Number, y: Number) -> list[pygame.Rect]:
         """
         Given a position, return all tiles that exist surrounding it.
         """
@@ -149,21 +150,29 @@ class Map:
 
         return rectangles
 
-    def position_in_tile(self, position: tuple[int | float, int | float]) -> bool:
+    def tile_key_for_position(self, position: Coordinates) -> _TileKey:
+        """
+        Given a position, return the key for the tile that it may exist within.
+        The tile for the key is not guaranteed to exist.
+        """
+
+        return int(position[0] // self.TILE_SIZE), int(position[1] // self.TILE_SIZE)
+
+    def position_in_tile(self, position: Coordinates) -> bool:
         """
         Return true if the given position is inside a tile.
         """
 
-        tile_key = int(position[0]), int(position[1])
+        tile_key = self.tile_key_for_position(position)
 
         return tile_key in self.tiles
 
-    def tile_for_position(self, position: tuple[int | float, int | float]) -> pygame.Rect | None:
+    def tile_for_position(self, position: Coordinates) -> pygame.Rect | None:
         """
         If the position is inside a tile, return the tile, else return None.
         """
 
-        tile_key = int(position[0]), int(position[1])
+        tile_key = self.tile_key_for_position(position)
 
         if tile_key in self.tiles:
             return self.tiles[tile_key]
