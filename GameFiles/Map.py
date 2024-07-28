@@ -1,16 +1,20 @@
+from typing import Generator
+
 import pygame
 
 from .Camera import Camera
 from .MapData import MapData
+
+_TileKey = tuple[int, int]
 
 
 class Map:
     TILE_SIZE = 128
 
     def __init__(self, map_data: MapData | None = None):
-        self.tiles: dict[str, pygame.Rect] = {}
+        self.tiles: dict[_TileKey, pygame.Rect] = {}
         """
-        A string of tile coords "x,y" to collision rectangle.
+        A string of tile coords as a tuple (x, y) to collision rectangle.
         """
 
         self.width: int = 0
@@ -47,8 +51,8 @@ class Map:
                 if tile == 0:
                     continue
 
-                self.tiles[f"{x},{y}"] = pygame.Rect(x * self.TILE_SIZE, y * self.TILE_SIZE,
-                                                     self.TILE_SIZE, self.TILE_SIZE)
+                self.tiles[(x, y)] = pygame.Rect(x * self.TILE_SIZE, y * self.TILE_SIZE,
+                                                 self.TILE_SIZE, self.TILE_SIZE)
 
         self.width = map_data.width
         self.height = map_data.height
@@ -58,37 +62,59 @@ class Map:
         self.y_min = 0
         self.y_max = self.TILE_SIZE * self.height
 
-    def surrounding_tiles(self, x: int, y: int) -> list[pygame.Rect]:
+    def _iter_surrounding_tile_keys(self, x: int, y: int) -> Generator[_TileKey, None, None]:
         """
-        Given a position, return all tiles that exist surrounding it.
+        Iterates over the tile keys surrounding the given coordinates.
+        Ignores any outside of the map.
+        Does not check if the tile keys exist.
         """
 
         tile_x_base = int(x // self.TILE_SIZE)
         tile_y_base = int(y // self.TILE_SIZE)
 
-        rectangles = []
-        for x_diff in range(-1, 2):
-            tile_x = tile_x_base + x_diff
+        tile_x_min = tile_x_base - 1
+        tile_x_max = tile_x_base + 2
 
-            if tile_x < 0:
-                continue
-            if tile_x >= self.width:
-                continue
+        if tile_x_min < 0:
+            tile_x_min = 0
+        if tile_x_max >= self.width:
+            tile_x_max = self.width
 
-            for y_diff in range(-1, 2):
-                tile_y = tile_y_base + y_diff
+        tile_y_min = tile_y_base - 1
+        tile_y_max = tile_y_base + 2
 
-                if tile_y < 0:
-                    continue
-                if tile_y >= self.height:
-                    continue
+        if tile_y_min < 0:
+            tile_y_min = 0
+        if tile_y_max >= self.height:
+            tile_y_max = self.height
 
-                tile_str = f"{tile_x},{tile_y}"
+        for tile_x in range(tile_x_min, tile_x_max):
+            for tile_y in range(tile_y_min, tile_y_max):
+                yield tile_x, tile_y
 
-                if tile_str in self.tiles:
-                    rectangles.append(self.tiles[tile_str])
+    def surrounding_tile_keys(self, x: int, y: int) -> list[_TileKey]:
+        """
+        Given a position, return all the keys for tiles that exist surrounding it.
+        """
 
-        return rectangles
+        tile_keys = []
+        for tile_key in self._iter_surrounding_tile_keys(x, y):
+            if tile_key in self.tiles:
+                tile_keys.append(tile_key)
+
+        return tile_keys
+
+    def surrounding_tiles(self, x: int, y: int) -> list[pygame.Rect]:
+        """
+        Given a position, return all tiles that exist surrounding it.
+        """
+
+        tile_rectangles = []
+        for tile_key in self._iter_surrounding_tile_keys(x, y):
+            if tile_key in self.tiles:
+                tile_rectangles.append(self.tiles[tile_key])
+
+        return tile_rectangles
 
     def tiles_touching(self, rect: pygame.Rect) -> list[pygame.Rect]:
         """
@@ -116,10 +142,10 @@ class Map:
         rectangles = []
         for tile_x in range(tile_x_min, tile_x_max):
             for tile_y in range(tile_y_min, tile_y_max):
-                tile_str = f"{tile_x},{tile_y}"
+                tile_key = (tile_x, tile_y)
 
-                if tile_str in self.tiles:
-                    rectangles.append(self.tiles[tile_str])
+                if tile_key in self.tiles:
+                    rectangles.append(self.tiles[tile_key])
 
         return rectangles
 
@@ -128,27 +154,29 @@ class Map:
         Return true if the given position is inside a tile.
         """
 
-        tile_str = f"{int(position[0])},{int(position[1])}"
+        tile_key = int(position[0]), int(position[1])
 
-        return tile_str in self.tiles
+        return tile_key in self.tiles
 
     def tile_for_position(self, position: tuple[int | float, int | float]) -> pygame.Rect | None:
         """
         If the position is inside a tile, return the tile, else return None.
         """
 
-        tile_str = f"{int(position[0])},{int(position[1])}"
+        tile_key = int(position[0]), int(position[1])
 
-        if tile_str in self.tiles:
-            return self.tiles[tile_str]
+        if tile_key in self.tiles:
+            return self.tiles[tile_key]
         return None
 
     def draw(self, camera: Camera):
+        display_rect = pygame.Rect(0, 0, self.TILE_SIZE, self.TILE_SIZE)
+
         for tile_rect in self.tiles.values():
             if not camera.can_see(tile_rect):
                 continue
 
-            display_rect = tile_rect.copy()
+            display_rect.topleft = tile_rect.topleft
             camera.convert_rect_to_camera_coordinates(display_rect)
 
             pygame.draw.rect(camera.window, (255, 127, 127), display_rect)
