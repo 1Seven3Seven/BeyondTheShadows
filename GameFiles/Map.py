@@ -94,6 +94,37 @@ class Map:
             for tile_y in range(tile_y_min, tile_y_max):
                 yield tile_x, tile_y
 
+    def iter_surrounding_tile_keys_in_range(self, x: Number, y: Number, range_: int) -> Generator[_TileKey, None, None]:
+        """
+        Iterates over the tile keys surrounding the given coordinates within a range.
+        The range is in tiles.
+        Ignores any outside of the map.
+        Does not check if the tile keys exist.
+        """
+
+        tile_x_base = int(x // self.TILE_SIZE)
+        tile_y_base = int(y // self.TILE_SIZE)
+
+        tile_x_min = tile_x_base - range_
+        tile_x_max = tile_x_base + range_ + 1
+
+        if tile_x_min < 0:
+            tile_x_min = 0
+        if tile_x_max >= self.width:
+            tile_x_max = self.width
+
+        tile_y_min = tile_y_base - range_
+        tile_y_max = tile_y_base + range_ + 1
+
+        if tile_y_min < 0:
+            tile_y_min = 0
+        if tile_y_max >= self.height:
+            tile_y_max = self.height
+
+        for tile_x in range(tile_x_min, tile_x_max):
+            for tile_y in range(tile_y_min, tile_y_max):
+                yield tile_x, tile_y
+
     def surrounding_tile_keys(self, x: Number, y: Number) -> list[_TileKey]:
         """
         Given a position, return all the keys for tiles that exist surrounding it.
