@@ -11,6 +11,7 @@ _TileKey = tuple[int, int]
 
 class Map:
     TILE_SIZE = 128
+    TILE_SIZE_2 = int(TILE_SIZE // 2)
 
     def __init__(self, map_data: MapData | None = None):
         self.tiles: dict[_TileKey, pygame.Rect] = {}
