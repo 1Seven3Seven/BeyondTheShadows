@@ -62,3 +62,43 @@ So if there is something like area damage, then that counters the Darklings well
 against the Stalkers.  
 The Consumers I want to be large and slow, imposing feeling, but not a danger if there is a light nearby as they will be
 targeted first.
+
+...
+
+I created the new Stalker enemy.
+Was not too difficult, it was quite similar to that of the basic enemy.
+But now it exists.  
+I have yet to do the other two enemies.  
+I think I want to work on damaging the enemies and the player next.  
+Mainly because that is actually gameplay related and the two new enemies are not really.  
+Well, they are, but not complete necessary for a demo.
+
+I also want to change the mapdata files a bit.
+Add some extra data, such as rooms and enemies.  
+A map consists of tiles for the walls, and rooms can be collections of empty tiles.  
+Enemies can exist within rooms, and they cannot leave, but they can roam around within them.  
+This allows me to prevent enemies from roaming too much.  
+The mapdata files can also contain information about the placement of enemies and which rooms they reside in.
+
+Finally, I also want to add in upgrades.  
+I have thought of four.
+An upgrade to:  
+-- the direct damage caused by the potions, if they directly hit an enemy before exploding.  
+-- the light damage by the light radius of an exploded potion.  
+-- the radius of the light cast by an exploded potion.  
+-- the distance a potion can be thrown.  
+The actual implementation of these should not be too difficult as the values that govern those are in variables.  
+So it is simply a matter of, if collide with upgrade, increment value.  
+It will probably be a little more difficult than that, but ehh.
+
+I also want to add in a boss, something like the basilisk demo I created.  
+Stripped down, but with the essence of it.  
+I do not know if this will happen, bit I like the idea of it.
+
+So in summary:  
+Implement damage.  
+That is direct damage and indirect damage.  
+If time persists, add enemy spawns to the mapdata.
+If time continues to persist, add rooms to the map data and make enemies subscribe to a room.  
+Then add in upgrades or the two missing enemies, either or, does not matter too much.  
+Finally, I want a boss.
