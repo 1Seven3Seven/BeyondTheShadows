@@ -99,7 +99,7 @@ class Map:
         """
 
         tile_keys = []
-        for tile_key in self._iter_surrounding_tile_keys(x, y):
+        for tile_key in self.iter_surrounding_tile_keys(x, y):
             if tile_key in self.tiles:
                 tile_keys.append(tile_key)
 
@@ -111,7 +111,7 @@ class Map:
         """
 
         tile_rectangles = []
-        for tile_key in self._iter_surrounding_tile_keys(x, y):
+        for tile_key in self.iter_surrounding_tile_keys(x, y):
             if tile_key in self.tiles:
                 tile_rectangles.append(self.tiles[tile_key])
 
