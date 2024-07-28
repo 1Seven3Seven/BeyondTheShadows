@@ -13,6 +13,7 @@ from .LightSource import LightSource
 from .Shadows import Shadows
 
 from .PotionUnexploded import PotionUnexploded
+from .PotionExploded import PotionExploded
 from .PotionHandler import PotionHandler
 
 from .Player import Player
