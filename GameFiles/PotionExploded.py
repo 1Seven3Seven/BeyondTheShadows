@@ -12,22 +12,24 @@ from .Shadows import Shadows
 class PotionExploded:
     # Light source stats
     BRIGHTNESS: int = 300
-    LIGHT_RADIUS: int = 128
-
-    SIZE: int = 20
-    """The size of the collision rectangle. Should be even."""
-    SIZE_2: int = int(SIZE // 2)
-    SIZE_4: int = int(SIZE // 4)
+    LIGHT_RADIUS: int = 80  # I like 80 as a start, and 128 as the max
+    LIGHT_RADIUS_SQRT_2 = int(LIGHT_RADIUS * math.sqrt(2))
 
     PARTICLE_SPAWN_TIME: int = 5
     """The delay in frames between spawning particles."""
     PARTICLE_LIFESPAN: int = 20
 
+    @classmethod
+    def increase_light_radius(cls, increase_by: int = 16) -> None:
+        cls.LIGHT_RADIUS += increase_by
+        cls.LIGHT_RADIUS_SQRT_2 = cls.LIGHT_RADIUS * math.sqrt(2)
+
     def __init__(self, x: int | float, y: int | float, shadows: Shadows):
         self.x = x
         self.y = y
 
-        self.rect: pygame.Rect = pygame.Rect(self.x - self.SIZE_2, self.y - self.SIZE_2, self.SIZE, self.SIZE)
+        self.rect: pygame.Rect = pygame.Rect(0, 0, self.LIGHT_RADIUS_SQRT_2, self.LIGHT_RADIUS_SQRT_2)
+        self.rect.center = self.x, self.y
 
         self.light_source: LightSource = LightSource(
             x, y, self.BRIGHTNESS, self.LIGHT_RADIUS
@@ -63,9 +65,7 @@ class PotionExploded:
 
         display_coords = camera.coordinates_to_display_coordinates(self.rect.center)
 
-        radius = self.SIZE_4 + self.SIZE_4 * (1 + math.cos(self.timer / 250 * math.pi * 2)) / 2
-
-        pygame.draw.circle(camera.window, (255, 127, 0), display_coords, radius)
+        pygame.draw.circle(camera.window, (255, 127, 0), display_coords, 10)
 
         display_rect = self.rect.copy()
         camera.convert_rect_to_camera_coordinates(display_rect)
