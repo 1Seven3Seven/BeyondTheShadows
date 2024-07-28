@@ -24,14 +24,16 @@ class Game:
 
         self.player: GameFiles.Player = GameFiles.Player(self.shadows)
 
-        self.enemies = [
-            GameFiles.BasicEnemy(200, 200)
-        ]
-
         self.potion_handler: GameFiles.PotionHandler = GameFiles.PotionHandler()
 
         self.particle_handler: GameFiles.ParticleHandler = GameFiles.ParticleHandler()
         self.particle_handler.add_particle_directory(pathlib.Path("GameFiles/Particles"))
+
+        self.enemy_handler: GameFiles.EnemyHandler = GameFiles.EnemyHandler()
+        self.enemy_handler.enemies.extend([
+            GameFiles.BasicEnemy(200, 200),
+            GameFiles.EnemyStalker(300, 300)
+        ])
 
         self.camera: GameFiles.Camera = GameFiles.Camera(self.window)
         self.camera.set_min_max_position(*self.map.min_max_positions())
@@ -52,7 +54,7 @@ class Game:
         keys = pygame.key.get_pressed()
         mouse_state = GameFiles.Helpers.get_mouse_state()
 
-        self.potion_handler.update(self.map, self.enemies, self.shadows, self.particle_handler)
+        self.potion_handler.update(self.map, self.enemy_handler.enemies, self.shadows, self.particle_handler)
 
         self.player.move(keys, self.map)
         self.player.update(keys, mouse_state, self.potion_handler, self.shadows)
@@ -63,11 +65,7 @@ class Game:
         self.map.draw(self.camera)
         self.potion_handler.draw(self.camera)
 
-        for enemy in self.enemies:
-            enemy.update(self.player)
-            enemy.move(self.map)
-
-            enemy.draw(self.camera)
+        self.enemy_handler.update_move_and_draw_enemies(self.player, self.map, self.potion_handler, self.camera)
 
         if keys[pygame.K_BACKSPACE]:
             if self.shadows.light_sources:
