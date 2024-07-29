@@ -75,9 +75,9 @@ class Game:
             if self.shadows.light_sources:
                 self.shadows.remove_light_source(self.shadows.light_sources[0])
 
-        self.shadows.render(self.camera)
-
         self.particle_handler.update_and_draw_particles(self.camera)
+
+        self.shadows.render(self.camera)
 
         pygame.display.flip()
 
