@@ -7,7 +7,7 @@ from .Map import Map
 
 
 class Entity(ABC):
-    def __init__(self, x: float, y: float, width: float, height: float, health: int):
+    def __init__(self, x: int, y: int, width: int, height: int, health: int):
         self.rect: pygame.Rect = pygame.Rect(x, y, width, height)
 
         self.health = health
