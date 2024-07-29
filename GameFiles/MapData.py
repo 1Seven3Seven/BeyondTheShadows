@@ -1,12 +1,12 @@
 import pathlib
 from typing import Generator
 
+from Helpers.CommonTypes import IntCoordinates
 from Helpers.FileReading import read_keys_and_values_from
 
-GeneralMapData = dict[str, list[str]]
-IntCoords = tuple[int, int]
-RoomData = tuple[IntCoords, IntCoords]
-EnemyData = tuple[str, IntCoords, int | None]
+_GeneralMapData = dict[str, list[str]]
+_RoomData = tuple[IntCoordinates, IntCoordinates]
+_EnemyData = tuple[str, IntCoordinates, int | None]
 
 
 class MapData:
@@ -24,13 +24,13 @@ class MapData:
         self.tiles: list[list[int]] = [[0 for _ in range(self.width)] for _ in range(self.height)]
         """A 2D array representing walls in the map."""
 
-        self.rooms: list[RoomData] = []
+        self.rooms: list[_RoomData] = []
         """
         Rooms are considered as rectangles inside the map, all empty tiles in the rectangle make the room.
         Rooms can overlap.
         """
 
-        self.enemies: list[EnemyData] = []
+        self.enemies: list[_EnemyData] = []
         """
         Enemies are represented as their key, the tile they are to spawn in, and the room they are constrained to.
         If the room is None, then there is no constraint.
@@ -60,7 +60,7 @@ class MapData:
             yield self.tiles[y]
 
     @staticmethod
-    def _process_width_and_height(map_data_keys_and_values: GeneralMapData) -> tuple[int, int]:
+    def _process_width_and_height(map_data_keys_and_values: _GeneralMapData) -> tuple[int, int]:
         if "DIMENSIONS" not in map_data_keys_and_values:
             raise ValueError(f"Could not find key 'DIMENSIONS' in map data")
 
@@ -86,7 +86,7 @@ class MapData:
         return width, height
 
     @staticmethod
-    def _process_tile_data_into(map_data_keys_and_values: GeneralMapData, empty_map_data: "MapData") -> None:
+    def _process_tile_data_into(map_data_keys_and_values: _GeneralMapData, empty_map_data: "MapData") -> None:
         if "TILE_DATA" not in map_data_keys_and_values:
             raise ValueError(f"Could not find key 'TILE_DATA' in map data")
 
@@ -102,7 +102,7 @@ class MapData:
                 empty_map_data.tiles[row_index][column_index] = int(row[column_index])
 
     @staticmethod
-    def _process_room(room_str: str) -> RoomData:
+    def _process_room(room_str: str) -> _RoomData:
         try:
             x1, y1, x2, y2 = map(int, room_str.split(","))
         except ValueError:
@@ -111,7 +111,7 @@ class MapData:
         return (x1, y1), (x2, y2)
 
     @staticmethod
-    def _process_rooms_into(map_data_keys_and_values: GeneralMapData, empty_map_data: "MapData") -> None:
+    def _process_rooms_into(map_data_keys_and_values: _GeneralMapData, empty_map_data: "MapData") -> None:
         if empty_map_data.rooms:
             raise ValueError(f"When asked to process rooms, given map data object already contains rooms")
 
@@ -128,7 +128,7 @@ class MapData:
             empty_map_data.rooms.append(MapData._process_room(room_str))
 
     @staticmethod
-    def _process_enemy(enemy_str: str) -> EnemyData:
+    def _process_enemy(enemy_str: str) -> _EnemyData:
         enemy_key, tile_x, tile_y, room_id = enemy_str.split(",")
 
         try:
@@ -148,7 +148,7 @@ class MapData:
         return enemy_key, (tile_x, tile_y), room_id
 
     @staticmethod
-    def _process_enemies_into(map_data_keys_and_values: GeneralMapData, empty_map_data: "MapData") -> None:
+    def _process_enemies_into(map_data_keys_and_values: _GeneralMapData, empty_map_data: "MapData") -> None:
         if empty_map_data.enemies:
             raise ValueError(f"When asked to process enemies, given map data object already contains enemies")
 
