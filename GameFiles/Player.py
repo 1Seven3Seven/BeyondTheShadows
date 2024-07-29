@@ -12,15 +12,17 @@ from .Shadows import Shadows
 
 
 class Player(Entity):
-    ATTACK_DELAY = 30
-    THROW_VELOCITY = 12
+    HEALTH: int = 100
+
+    ATTACK_DELAY: int = 30
+    THROW_VELOCITY: int = 12
 
     # About the light the player casts
-    BRIGHTNESS = 255
-    LIGHT_RADIUS = 64
+    BRIGHTNESS: int = 255
+    LIGHT_RADIUS: int = 64
 
     def __init__(self, shadows: Shadows):
-        super().__init__(300, 300, 50, 50, 100)
+        super().__init__(300, 300, 50, 50, self.HEALTH)
 
         self.attack_delay = self.ATTACK_DELAY
         self.display_rect: pygame.Rect = self.rect.copy()
@@ -47,9 +49,7 @@ class Player(Entity):
 
         self.attack_delay = self.ATTACK_DELAY
 
-    def update(self, keys: pygame.key.ScancodeWrapper, mouse_state: MouseSate,
-               potion_handler: PotionHandler, shadows: Shadows):
-        self._update_attack(keys, mouse_state, potion_handler, shadows)
+    def _update_light_source(self, shadows: Shadows) -> None:
 
         shadows.remove_light_source(self.light_source)
 
@@ -57,6 +57,11 @@ class Player(Entity):
         self.light_source.y = self.rect.centery
 
         shadows.add_light_source(self.light_source)
+
+    def update(self, keys: pygame.key.ScancodeWrapper, mouse_state: MouseSate,
+               potion_handler: PotionHandler, shadows: Shadows):
+        self._update_attack(keys, mouse_state, potion_handler, shadows)
+        self._update_light_source(shadows)
 
     def move(self, keys: pygame.key.ScancodeWrapper, map_: Map):
         y_movement = 0
