@@ -76,7 +76,7 @@ class EnemyStalker(Enemy):
         self.target_timer = self.TARGET_TIME
 
         _temp = self._distance_to_position_squared(player.rect.center)
-        distance_to_player_squared, x_diff_squared, y_diff_squared = _temp
+        distance_to_player_squared, *_ = _temp
 
         # If we can see the player, target the player
         if distance_to_player_squared < self.TARGET_DISTANCE_PLAYER_SQUARED:
@@ -114,13 +114,11 @@ class EnemyStalker(Enemy):
         x_move = x_diff
         if abs(x_diff) > 1:
             x_move = -1 if x_diff < 0 else 1
+        self.move_x(map_, x_move)
 
         y_move = y_diff
         if abs(y_diff) > 1:
             y_move = -1 if y_diff < 0 else 1
-
-        # Move to target
-        self.move_x(map_, x_move)
         self.move_y(map_, y_move)
 
     def draw(self, camera: Camera) -> None:
