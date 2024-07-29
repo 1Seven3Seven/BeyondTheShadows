@@ -66,8 +66,6 @@ class PotionUnexploded:
         shadows.add_light_source(self.light_source)
 
     def update(self, map_: Map, enemies: list[Entity], shadows: Shadows, particle_handler: ParticleHandler) -> None:
-        # ToDo: add collision with enemies
-
         # Should not occur, but if the potion has collided with something, then do not update
         if self.exploded:
             return
