@@ -6,7 +6,7 @@ import GameFiles
 
 
 class Game:
-    def __init__(self, window: pygame.Surface | None = None):
+    def __init__(self, window: pygame.Surface):
         self.window: pygame.Surface = window
         self.clock: pygame.time.Clock = pygame.time.Clock()
 
@@ -78,6 +78,8 @@ class Game:
         self.particle_handler.update_and_draw_particles(self.camera)
 
         self.shadows.render(self.camera)
+
+        print(f"Player health {self.player.health}")
 
         pygame.display.flip()
 
