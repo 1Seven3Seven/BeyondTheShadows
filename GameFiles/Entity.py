@@ -64,3 +64,14 @@ class Entity(ABC):
     @abstractmethod
     def draw(self, camera: Camera) -> None:
         raise NotImplementedError
+
+    def deal_damage(self, damage: int) -> bool:
+        """
+        Deals the given damage to the entity.
+        Returns if the entity has died.
+        """
+
+        self.health -= damage
+        if self.health <= 0:
+            return True
+        return False
