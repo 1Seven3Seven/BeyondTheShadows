@@ -104,3 +104,53 @@ Then add in upgrades or the two missing enemies, either or, does not matter too 
 Finally, I want a boss.
 
 ...
+
+Enemies can now be damaged, and killed.  
+The player can also be damaged, although not killed, yet.
+Evil laughter.  
+The mapdata file has been upgraded to allow for rooms and enemy spawns.  
+Although interacting with rooms themselves has not been implemented.
+
+So, what next?  
+Well, I want the stalker to stay in its room, bad stalker, too much stalking.   
+If it leaves the room by following the player, then it will beeline towards the closest tile in that room.  
+I do not really care if it cannot get there.
+Sorry stalkers.
+
+Once the stalkers are confined to their rooms, then I want the upgrades to be worked on.  
+The map data should include the upgrades and their locations.  
+I do not think that this would take that much time.
+Hopefully...
+
+After upgrades, then I think creating some sprites and beautifying the game would be a good idea.  
+Small sound effects and more particles.  
+It is kind of bland as it is.  
+Sprites could include, potion unexploded and exploded, the player and the upgrades.  
+Beautifying could include making the floor more than just once colour, and the walls not pink.  
+Although the wall colour has grown on me a little.  
+Also a bunch of particles when the stalker dies.  
+It is kind of flat how it just, disappears.
+
+I also want a title screen and a way to replay without reloading the page.  
+If time persists, then work on the boss or the other two enemies.  
+These are not a priority at all.
+
+I forgot about the player dying.  
+If the player dies, then just slap some text on the screen saying so.  
+A simple health bar can also be made, figure that out future me.  
+If we have a title screen, then send there after death.
+
+So, what next?  
+-- Confine stalkers to their rooms.  
+-- Implement upgrades.  
+-- Add upgrades to the map data.    
+-- Player can die.  
+-- Beautify the game.
+
+Maybe...
+-- Title screen.  
+-- Replay button.  
+-- Boss monster.  
+-- The other enemies.
+
+...
