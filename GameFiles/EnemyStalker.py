@@ -18,11 +18,16 @@ class EnemyStalker(Enemy):
     TARGET_DISTANCE_PLAYER = 128
     TARGET_DISTANCE_PLAYER_SQUARED = TARGET_DISTANCE_PLAYER * TARGET_DISTANCE_PLAYER
 
+    DAMAGE_TIME: int = 2
+    DAMAGE: int = 1
+
     def __init__(self, x: Number, y: Number, update_offset: int = 0):
         super().__init__(x, y, 32, 32, 100)
 
         self.target: Coordinates = self.rect.center
         self.target_timer: int = self.TARGET_TIME + update_offset
+
+        self.damage_timer: int = self.DAMAGE_TIME
 
     def _distance_to_position_squared(self, position: Coordinates) -> tuple[Number, Number, Number]:
         """
@@ -80,8 +85,18 @@ class EnemyStalker(Enemy):
         else:
             self._choose_new_tile_as_target(map_)
 
+    def _damage_player(self, player: Player) -> None:
+        if self.rect.colliderect(player.rect):
+            if self.damage_timer >= 0:
+                self.damage_timer -= 1
+                return
+
+            self.damage_timer = self.DAMAGE_TIME
+            player.deal_damage(self.DAMAGE)
+
     def update(self, player: Player, map_: Map, potion_handler: PotionHandler) -> None:
         self._update_target(player, map_)
+        self._damage_player(player)
 
     def move(self, map_: Map) -> None:
         x_diff = self.target[0] - self.rect.centerx
