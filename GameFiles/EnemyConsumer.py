@@ -14,3 +14,9 @@ class EnemyConsumer(Enemy):
 
     def draw(self, camera: Camera) -> None:
         pass
+
+    def set_room_id(self, room_id: int, map_: Map) -> None:
+        pass
+
+    def set_center(self, coords: Coordinates):
+        pass
