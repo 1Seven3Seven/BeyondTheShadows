@@ -132,3 +132,11 @@ class EnemyStalker(Enemy):
         # Drawing the target
         # camera_coords = camera.coordinates_to_display_coordinates(self.target)
         # pygame.draw.circle(camera.window, (255, 0, 0), camera_coords, 5)
+
+    def set_room_id(self, room_id: int, map_: Map) -> None:
+        # ToDo: actually implement this
+        pass
+
+    def set_center(self, coords: Coordinates):
+        self.rect.center = coords
+        self.target = coords
