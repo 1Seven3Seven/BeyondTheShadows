@@ -3,6 +3,7 @@ import math
 import pygame
 
 from .Camera import Camera
+from .Entity import Entity
 from .LightSource import LightSource
 from .Map import Map
 from .ParticleHandler import ParticleHandler
@@ -10,8 +11,15 @@ from .Shadows import Shadows
 
 
 class PotionUnexploded:
-    BRIGHTNESS: int = 300
-    RADIUS: int = 128
+    SIZE = 10 * 1.5
+    """The size of the square hitbox given a circle of radius 10 as the sprite."""
+
+    DAMAGE: int = 10  # I think that 10 as a base and 50 as max is good
+    """The damage done upon direct contact with an enemy."""
+
+    @classmethod
+    def increase_damage(cls, increase_by: int = 10):
+        cls.DAMAGE += increase_by
 
     def __init__(self, x: int | float, y: int | float, angle: float, velocity: int | float, shadows: Shadows):
         """
@@ -23,6 +31,8 @@ class PotionUnexploded:
 
         self.x = x
         self.y = y
+
+        self.rect: pygame.Rect = pygame.Rect(0, 0, self.SIZE, self.SIZE)
 
         self.angle = angle
         self.velocity = velocity
@@ -38,11 +48,24 @@ class PotionUnexploded:
         )
         shadows.add_light_source(self.light_source)
 
+        self.damage: int = self.DAMAGE
+
     def explode(self, shadows: Shadows) -> None:
         self.exploded = True
         shadows.remove_light_source(self.light_source)
 
-    def update(self, map_: Map, enemies: list, shadows: Shadows, particle_handler: ParticleHandler) -> None:
+    def _move_and_update_light_source(self, shadows: Shadows) -> None:
+        self.x += self.vx * self.velocity
+        self.y += self.vy * self.velocity
+        self.velocity -= 1
+
+        # Update the light source position
+        shadows.remove_light_source(self.light_source)
+        self.light_source.x = self.x
+        self.light_source.y = self.y
+        shadows.add_light_source(self.light_source)
+
+    def update(self, map_: Map, enemies: list[Entity], shadows: Shadows, particle_handler: ParticleHandler) -> None:
         # ToDo: add collision with enemies
 
         # Should not occur, but if the potion has collided with something, then do not update
@@ -50,21 +73,20 @@ class PotionUnexploded:
             return
 
         # If no longer moving
-        if self.velocity == 0:
+        if self.velocity <= 0:
             self.explode(shadows)
             return
 
-        # If moving, then move
-        self.x += self.vx * self.velocity
-        self.y += self.vy * self.velocity
-        self.velocity -= 1
+        self._move_and_update_light_source(shadows)
 
-        shadows.remove_light_source(self.light_source)
+        # Position the collision rectangle
+        self.rect.center = self.x, self.y
 
-        self.light_source.x = self.x
-        self.light_source.y = self.y
-
-        shadows.add_light_source(self.light_source)
+        # Check for collision with enemies
+        for enemy in enemies:
+            if self.rect.colliderect(enemy.rect):
+                enemy.deal_damage(self.damage)
+                self.explode(shadows)
 
         # Check for collisions with tiles
         for rect in map_.surrounding_tiles(self.x, self.y):
