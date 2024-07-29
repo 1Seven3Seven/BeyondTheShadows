@@ -79,12 +79,9 @@ class Game:
 
         self.shadows.render(self.camera)
 
-        print(f"Player health {self.player.health}")
-
         pygame.display.flip()
 
-        tick = self.clock.tick(60)
-        # print(tick)
+        self.clock.tick(60)
 
 
 def main():
