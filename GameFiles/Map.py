@@ -3,10 +3,10 @@ from typing import Generator
 import pygame
 
 from .Camera import Camera
-from .Helpers.CommonTypes import Coordinates, Number
+from .Helpers.CommonTypes import Coordinates, Number, IntCoordinates
 from .MapData import MapData
 
-_TileKey = tuple[int, int]
+_TileKey = IntCoordinates
 
 
 class Map:
@@ -17,6 +17,12 @@ class Map:
         self.tiles: dict[_TileKey, pygame.Rect] = {}
         """
         A string of tile coords as a tuple (x, y) to collision rectangle.
+        """
+
+        self.rooms: list[list[_TileKey]] = []
+        """
+        A list of all rooms this map has.
+        Rooms here are a list of all the empty tiles for the room.
         """
 
         self.width: int = 0
@@ -45,7 +51,7 @@ class Map:
 
         return self.x_min, self.x_max, self.y_min, self.y_max
 
-    def generate_from(self, map_data: MapData):
+    def _generate_tiles(self, map_data: MapData) -> None:
         self.tiles = {}
 
         for y, row in enumerate(map_data.rows()):
@@ -56,6 +62,41 @@ class Map:
                 self.tiles[(x, y)] = pygame.Rect(x * self.TILE_SIZE, y * self.TILE_SIZE,
                                                  self.TILE_SIZE, self.TILE_SIZE)
 
+    def _generate_rooms(self, map_data: MapData) -> None:
+        """
+        Expects the tiles to be already generated.
+        """
+
+        self.rooms = []
+
+        for room in map_data.rooms:
+            x_min = room[0]
+            y_min = room[1]
+            x_max = room[2]
+            y_max = room[3]
+
+            if x_min > x_max:
+                x_min, x_max = x_max, x_min
+            if y_min > y_max:
+                y_min, y_max = y_max, y_min
+
+            if x_max >= map_data.width:
+                x_max = map_data.width
+            if y_max >= map_data.height:
+                y_max = map_data.height
+
+            room_tile_keys = []
+
+            for tile_x in range(x_min, x_max + 1):
+                for tile_y in range(y_min, y_max + 1):
+                    tile_key = tile_x, tile_y
+
+                    if tile_key not in self.tiles:
+                        room_tile_keys.append(tile_key)
+
+            self.rooms.append(room_tile_keys)
+
+    def generate_from(self, map_data: MapData) -> None:
         self.width = map_data.width
         self.height = map_data.height
 
@@ -63,6 +104,9 @@ class Map:
         self.x_max = self.TILE_SIZE * self.width
         self.y_min = 0
         self.y_max = self.TILE_SIZE * self.height
+
+        self._generate_tiles(map_data)
+        self._generate_rooms(map_data)
 
     def iter_surrounding_tile_keys(self, x: Number, y: Number) -> Generator[_TileKey, None, None]:
         """
