@@ -1,7 +1,12 @@
 import pathlib
-from typing import Generator, TextIO
+from typing import Generator
 
-from .Helpers.FileReading import next_line_with_data
+from Helpers.FileReading import read_keys_and_values_from
+
+GeneralMapData = dict[str, list[str]]
+IntCoords = tuple[int, int]
+RoomData = tuple[IntCoords, IntCoords]
+EnemyData = tuple[str, IntCoords, int | None]
 
 
 class MapData:
@@ -16,9 +21,20 @@ class MapData:
         self.width: int = width
         self.height: int = height
 
-        self.tiles: list[list[int]] = [
-            [0 for _ in range(self.width)] for _ in range(self.height)
-        ]
+        self.tiles: list[list[int]] = [[0 for _ in range(self.width)] for _ in range(self.height)]
+        """A 2D array representing walls in the map."""
+
+        self.rooms: list[RoomData] = []
+        """
+        Rooms are considered as rectangles inside the map, all empty tiles in the rectangle make the room.
+        Rooms can overlap.
+        """
+
+        self.enemies: list[EnemyData] = []
+        """
+        Enemies are represented as their key, the tile they are to spawn in, and the room they are constrained to.
+        If the room is None, then there is no constraint.
+        """
 
     def __str__(self, pretty: bool = False) -> str:
         tile_wall = "1"
@@ -43,57 +59,112 @@ class MapData:
         for y in range(self.height):
             yield self.tiles[y]
 
-    @classmethod
-    def read_map_dimensions(cls, file: TextIO) -> tuple[int, int]:
-        """
-        Reads the width and height of the map data from the file.
+    @staticmethod
+    def _process_width_and_height(map_data_keys_and_values: GeneralMapData) -> tuple[int, int]:
+        if "DIMENSIONS" not in map_data_keys_and_values:
+            raise ValueError(f"Could not find key 'DIMENSIONS' in map data")
 
-        Assumes that the file has not been read from yet.
-        """
+        data = map_data_keys_and_values["DIMENSIONS"]
+        if not data:
+            raise ValueError("Found no data for key 'DIMENSIONS'")
 
-        line = next_line_with_data(file)
-
-        if line != "DIMENSIONS":
-            raise ValueError(f"Expected 'DIMENSIONS' but got '{line}'")
-
-        line = next_line_with_data(file)
+        if len(data) != 1:
+            raise ValueError(f"Expected one line of data for key 'DIMENSIONS' but found {len(data)}")
+        data = data[0]
 
         try:
-            width, height = line.split(",")
+            width, height = data.split(",")
         except ValueError:
-            raise ValueError(f"Expected 'WIDTH,HEIGHT' but got '{line}'")
+            raise ValueError(f"Expected data formatted as 'WIDTH,HEIGHT' but got '{data}'")
 
-        return int(width), int(height)
+        try:
+            width = int(width)
+            height = int(height)
+        except ValueError:
+            raise ValueError(f"Width and Height are not integers but {width}, {height}")
 
-    @classmethod
-    def read_map_tile_data_into(cls, file: TextIO, empty_map_data: "MapData") -> None:
-        """
-        Reads the tile data of the map from the file into the given map data object.
-        Uses the width and height already in the object.
-        """
+        return width, height
 
-        line = next_line_with_data(file)
+    @staticmethod
+    def _process_tile_data_into(map_data_keys_and_values: GeneralMapData, empty_map_data: "MapData") -> None:
+        if "TILE_DATA" not in map_data_keys_and_values:
+            raise ValueError(f"Could not find key 'TILE_DATA' in map data")
 
-        if line != "TILE_DATA":
-            raise ValueError(f"Expected 'TILE_DATA' but got '{line}'")
+        data = map_data_keys_and_values["TILE_DATA"]
+        if len(data) != empty_map_data.height:
+            raise ValueError(f"Data height {len(data)} does not match expected height {empty_map_data.height}.")
 
-        row_index = 0  # Preventing pycharm from yelling at me
-        for row_index in range(empty_map_data.height):
-            line = next_line_with_data(file)
-
-            if len(line) != empty_map_data.width:
-                raise ValueError(f"Data width {len(line)} does not match expected width {empty_map_data.width}.")
+        for row_index, row in enumerate(data):
+            if len(row) != empty_map_data.width:
+                raise ValueError(f"Data width {len(row)} does not match expected width {empty_map_data.width}.")
 
             for column_index in range(empty_map_data.width):
-                empty_map_data.tiles[row_index][column_index] = int(line[column_index])
+                empty_map_data.tiles[row_index][column_index] = int(row[column_index])
 
-        row_index += 1
+    @staticmethod
+    def _process_room(room_str: str) -> RoomData:
+        try:
+            x1, y1, x2, y2 = map(int, room_str.split(","))
+        except ValueError:
+            raise ValueError(f"Could not parse room string '{room_str}', expected as 'X1,Y1,X2,Y2'")
 
-        if row_index != empty_map_data.height:
-            raise ValueError(f"Data height {row_index} does not match expected height {empty_map_data.height}.")
+        return (x1, y1), (x2, y2)
 
-    @classmethod
-    def from_file(cls, path: pathlib.Path) -> "MapData":
+    @staticmethod
+    def _process_rooms_into(map_data_keys_and_values: GeneralMapData, empty_map_data: "MapData") -> None:
+        if empty_map_data.rooms:
+            raise ValueError(f"When asked to process rooms, given map data object already contains rooms")
+
+        # Rooms are completely optional
+        if "ROOMS" not in map_data_keys_and_values:
+            return
+
+        data = map_data_keys_and_values["ROOMS"]
+        if not data:
+            # If the key is found, I assume you want rooms, but there is no data
+            raise ValueError("Found no data for key 'ROOMS'")
+
+        for room_str in data:
+            empty_map_data.rooms.append(MapData._process_room(room_str))
+
+    @staticmethod
+    def _process_enemy(enemy_str: str) -> EnemyData:
+        enemy_key, tile_x, tile_y, room_id = enemy_str.split(",")
+
+        try:
+            tile_x = int(tile_x)
+            tile_y = int(tile_y)
+        except ValueError:
+            raise ValueError(f"Could not parse enemy string '{enemy_str}' due to invalid tile coordinates")
+
+        if room_id:
+            try:
+                room_id = int(room_id)
+            except ValueError:
+                raise ValueError(f"Could not parse enemy string '{enemy_str}' due to invalid room id")
+        else:
+            room_id = None
+
+        return enemy_key, (tile_x, tile_y), room_id
+
+    @staticmethod
+    def _process_enemies_into(map_data_keys_and_values: GeneralMapData, empty_map_data: "MapData") -> None:
+        if empty_map_data.enemies:
+            raise ValueError(f"When asked to process enemies, given map data object already contains enemies")
+
+        # Enemies are completely optional
+        if "ENEMIES" not in map_data_keys_and_values:
+            return
+
+        data = map_data_keys_and_values["ENEMIES"]
+        if not data:
+            raise ValueError("Found no data for key 'ENEMIES'")
+
+        for enemy_str in data:
+            empty_map_data.enemies.append(MapData._process_enemy(enemy_str))
+
+    @staticmethod
+    def from_file(path: pathlib.Path) -> "MapData":
         """
         Creates a MapData object from a .mapdata file.
 
@@ -106,22 +177,18 @@ class MapData:
         if not path.suffix == ".mapdata":
             raise ValueError("File must be an .mapdata file.")
 
-        with path.open() as file:
-            # Generate an empty map data object
-            map_data = cls(*cls.read_map_dimensions(file))
+        map_data_keys_and_values = read_keys_and_values_from(path)
 
-            # Fill the map data object with, well, map data
-            cls.read_map_tile_data_into(file, map_data)
-
-            # ToDo: continue reading the file for any optional entries
-            # ToDo: create the optional entries to read
-            # Those should probably be the other way around, but ehh
+        map_data = MapData(*MapData._process_width_and_height(map_data_keys_and_values))
+        MapData._process_tile_data_into(map_data_keys_and_values, map_data)
+        MapData._process_rooms_into(map_data_keys_and_values, map_data)
+        MapData._process_enemies_into(map_data_keys_and_values, map_data)
 
         return map_data
 
 
 def main():
-    map_data = MapData.from_file(pathlib.Path("Maps/test.mapdata"))
+    map_data = MapData.from_file(pathlib.Path("Maps/demo.mapdata"))
 
     print(map_data)
     print()
