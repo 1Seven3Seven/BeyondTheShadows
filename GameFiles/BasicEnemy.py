@@ -5,6 +5,7 @@ import pygame
 
 from .Camera import Camera
 from .Enemy import Enemy
+from .Helpers.CommonTypes import Coordinates
 from .Map import Map
 from .Player import Player
 
@@ -49,6 +50,13 @@ class BasicEnemy(Enemy):
 
         self.sub_sprite = pygame.surface.Surface((CIRCLE_RADIUS * 2 + 1, CIRCLE_RADIUS * 2 + 1))
         self.sub_sprite_rect = self.sub_sprite.get_rect()
+
+    def set_room_id(self, room_id: int, map_: Map) -> None:
+        pass
+
+    def set_center(self, coords: Coordinates):
+        self.rect.center = coords
+        self.target = coords
 
     def _update_target(self, player: Player):
         if self.target_timer > 0:
