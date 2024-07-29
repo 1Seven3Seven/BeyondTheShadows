@@ -1,15 +1,14 @@
 # The map data
-# Sections are headed by an all caps key
-# This dictates what to read
-# After a section has been read, the next key should be found
-# The DIMENSIONS should always come before the TILE_DATA
-# Then after that is a bunch of optional keys
+# Sections start with a colon, then an all caps key on the same line
+# Sections continue to either the next section, or the end of the file
 
-DIMENSIONS
+:DIMENSIONS
 # States the width and height of the map
+# WIDTH,HEIGHT
+# No spaces
 15,10
 
-TILE_DATA
+:TILE_DATA
 # The map data itself
 # A series of boolean values for if a tile exists or not
 # Should have the same width and height as stated in DIMENSIONS
@@ -23,3 +22,40 @@ TILE_DATA
 100011001000001
 100000000000001
 111111111111111
+
+:ROOMS
+# Rectangular sections of the map
+# These are used to constrain the movement of enemies
+# Rooms can overlap
+# This entry is optional
+# Each room is a set of four values on one line
+# X1,Y1,X2,Y2
+# No spaces
+# The values are the coordinates of two tile as the corners of the room
+
+# Area just right of the start
+5,1,6,3
+# Corridor right of the start
+7,3,13,3
+# First room on the top
+8,1,10,2
+# Second room on the top
+12,1,13,2
+
+# Bottom right large room, not including entrances
+5,9,13,8
+# Bottom left large room with something in the center
+1,5,7,8
+
+:ENEMIES
+# Enemies that are to be spawned into the map
+# enemy_key,tile_x,tile_y,room_id
+# The room_id is the index of the room and is also optional
+# This entire entry is optional
+
+# Spawn a stalker in tile at 5,2 with room id 0
+stalker,5,2,0
+
+# Spawn a stalker in tile 1,1 with no room
+# Here the trailing comma is necessary
+stalker,1,1,
