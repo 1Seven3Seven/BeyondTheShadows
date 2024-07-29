@@ -70,10 +70,10 @@ class Map:
         self.rooms = []
 
         for room in map_data.rooms:
-            x_min = room[0]
-            y_min = room[1]
-            x_max = room[2]
-            y_max = room[3]
+            x_min = room[0][0]
+            y_min = room[0][1]
+            x_max = room[1][0]
+            y_max = room[1][1]
 
             if x_min > x_max:
                 x_min, x_max = x_max, x_min
