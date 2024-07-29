@@ -98,7 +98,7 @@ I do not know if this will happen, bit I like the idea of it.
 So in summary:  
 Implement damage.  
 That is direct damage and indirect damage.  
-If time persists, add enemy spawns to the mapdata.
+If time persists, add enemy spawns to the mapdata.  
 If time continues to persist, add rooms to the map data and make enemies subscribe to a room.  
 Then add in upgrades or the two missing enemies, either or, does not matter too much.  
 Finally, I want a boss.
