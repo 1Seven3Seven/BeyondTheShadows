@@ -30,10 +30,11 @@ class Game:
         self.particle_handler.add_particle_directory(pathlib.Path("GameFiles/Particles"))
 
         self.enemy_handler: GameFiles.EnemyHandler = GameFiles.EnemyHandler()
-        self.enemy_handler.enemies.extend([
-            GameFiles.BasicEnemy(200, 200),
-            GameFiles.EnemyStalker(300, 300)
-        ])
+        self.enemy_handler.setup_enemies_from(self.map_data, self.map)
+        # self.enemy_handler.enemies.extend([
+        #     GameFiles.BasicEnemy(200, 200),
+        #     GameFiles.EnemyStalker(300, 300)
+        # ])
 
         self.camera: GameFiles.Camera = GameFiles.Camera(self.window)
         self.camera.set_min_max_position(*self.map.min_max_positions())
