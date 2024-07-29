@@ -130,6 +130,10 @@ class Shadows:
             affected_tile.add_light_source(light_source, math.sqrt(distance_squared))
 
     def remove_light_source(self, light_source: LightSource) -> None:
+        # Skip if not present
+        if light_source not in self.light_sources:
+            return
+
         # Bye
         self.light_sources.remove(light_source)
 
