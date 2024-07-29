@@ -1,8 +1,8 @@
 import pathlib
 from typing import Generator
 
-from Helpers.CommonTypes import IntCoordinates
-from Helpers.FileReading import read_keys_and_values_from
+from .Helpers.CommonTypes import IntCoordinates
+from .Helpers.FileReading import read_keys_and_values_from
 
 _GeneralMapData = dict[str, list[str]]
 _RoomData = tuple[IntCoordinates, IntCoordinates]
