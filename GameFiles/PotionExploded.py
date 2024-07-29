@@ -104,8 +104,6 @@ class PotionExploded:
                 enemy.deal_damage(self.damage)
                 self.health -= 1
 
-                print(f"Health: {self.health}")
-
                 if self.health <= 0:
                     self._double_explode(particle_handler)
                     return True
