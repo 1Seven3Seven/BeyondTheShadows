@@ -65,3 +65,19 @@ stalker,5,2,0
 # Spawn a stalker in tile 1,1 with no room
 # Here the trailing comma is necessary
 stalker,1,1,
+
+:UPGRADES
+# The upgrades that exist within the map
+# upgrade_key,tile_x,tile_y,tile_offset_x,tile_offset_y
+# The upgrade should be placed in the center of the tile
+# The extra offsets are pixel modifications for more precise positioning
+
+# Spawn a direct damage upgrade at tile 5,1 with no extra offset
+u_direct_damage,5,1,0,0
+
+# Spawn a exploded potion lifespan upgrade at tile 12,1 with an offset of -50 in the x and 50 in the y
+u_exploded_potion_lifespan,12,1,-50,50
+
+# Some more upgrades
+u_light_radius,8,1,-50,-50
+u_throw_velocity,1,5,-50,-50
