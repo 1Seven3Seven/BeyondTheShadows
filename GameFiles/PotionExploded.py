@@ -8,6 +8,7 @@ from .Entity import Entity
 from .LightSource import LightSource
 from .ParticleHandler import ParticleHandler
 from .Shadows import Shadows
+from .ShrinkingLightSource import ShrinkingLightSource
 
 
 class PotionExploded:
@@ -36,6 +37,8 @@ class PotionExploded:
     DAMAGE_FRAME: int = 6
 
     WEAR_OUT_FRAME: int = 18  # Lasts 30 seconds if nothing happens and 60 at max health
+
+    NUM_DOUBLE_EXPLODE_PARTICLES = 10
 
     # Note the max damage delt via exposure is HEALTH * DAMAGE
 
@@ -112,7 +115,7 @@ class PotionExploded:
             self.PARTICLE_LIFESPAN
         )
 
-    def _damage_enemies(self, particle_handler: ParticleHandler, enemies: list[Entity]) -> bool:
+    def _damage_enemies(self, enemies: list[Entity]) -> bool:
         """
         Returns true of the potion has double exploded.
         """
@@ -129,14 +132,31 @@ class PotionExploded:
                 self.health -= 1
 
                 if self.health <= 0:
-                    self._double_explode(particle_handler)
                     return True
 
         return False
 
-    def _double_explode(self, particle_handler: ParticleHandler) -> None:
-        # ToDo: explode with style, and particles
+    def _double_explode(self, shadows: Shadows, particle_handler: ParticleHandler) -> None:
         self.double_exploded = True
+
+        shadows.add_updating_light_source(
+            ShrinkingLightSource(self.x, self.y, self.BRIGHTNESS, self.LIGHT_RADIUS, 30),
+        )
+
+        for _ in range(self.NUM_DOUBLE_EXPLODE_PARTICLES):
+
+            velocity = random.randint(1, 3)
+            angle = random.uniform(0, 2 * math.pi)
+
+            vx = math.cos(angle) * velocity
+            vy = math.sin(angle) * velocity
+
+            particle_handler.create_particle(
+                "double exploded potion",
+                self.x, self.y,
+                vx, vy,
+                random.randint(10, 20)
+            )
 
     def _wear_out(self) -> bool:
         """
@@ -156,15 +176,17 @@ class PotionExploded:
             return True
         return False
 
-    def update(self, particle_handler: ParticleHandler, enemies: list[Entity]) -> None:
+    def update(self, shadows: Shadows, particle_handler: ParticleHandler, enemies: list[Entity]) -> None:
         # Should not occur, do thing if to be deleted
         if self.double_exploded:
             return
 
-        if self._damage_enemies(particle_handler, enemies):
+        if self._damage_enemies(enemies):
+            self._double_explode(shadows, particle_handler)
             return
 
         if self._wear_out():
+            self._double_explode(shadows, particle_handler)
             return
 
         self._spawn_particles(particle_handler)

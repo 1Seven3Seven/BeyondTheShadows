@@ -43,7 +43,7 @@ class PotionHandler:
                 del self.exploded_potions[i]
                 continue
 
-            potion_exploded.update(particle_handler, enemies)
+            potion_exploded.update(shadows, particle_handler, enemies)
 
     def draw(self, camera: Camera) -> None:
         for potion in self.unexploded_potions:
