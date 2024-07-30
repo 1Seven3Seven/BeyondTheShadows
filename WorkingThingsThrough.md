@@ -190,11 +190,11 @@ I also want the exploded potion light to disappear slowly, not straight away.
 Should not be the most difficult...
 
 So, to make things simple:  
--- Allow the player to be killed.
+-- Allow the player to be killed.  
 -- Restart the game when this happens.  
 -- Create a basic hud/ui.  
--- Beautification.
--- Boss monster.
+-- Beautification.  
+-- Boss monster.  
 -- More beautification. 
 
 ...
