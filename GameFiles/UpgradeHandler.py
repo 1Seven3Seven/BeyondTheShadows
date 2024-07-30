@@ -42,7 +42,7 @@ class UpgradeHandler:
                 raise ValueError(f"Unknown upgrade key '{upgrade_key}'")
 
             new_upgrade: UpgradeBase
-            new_upgrade = _UPGRADE_KEY_TO_CLASS[upgrade_key](
+            new_upgrade = _UPGRADE_KEY_TO_CLASS[upgrade_key](  # NOQA: upgrade key is a str, not a literal as above
                 tile_key[0] * map_.TILE_SIZE + map_.TILE_SIZE_2 + tile_offset[0],
                 tile_key[1] * map_.TILE_SIZE + map_.TILE_SIZE_2 + tile_offset[1]
             )
