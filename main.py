@@ -12,10 +12,13 @@ game = Game(window)
 
 
 async def main():
-    while game.running:
-        game.step()
+    while not game.window_closed:
+        while game.running:
+            game.step()
 
-        await asyncio.sleep(0)
+            await asyncio.sleep(0)
+
+        game.regenerate_with_stored_map_data()
 
 
 asyncio.run(main())
