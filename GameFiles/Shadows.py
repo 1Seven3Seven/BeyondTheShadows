@@ -120,8 +120,7 @@ class Shadows:
         light_source: UpdatingLightSource
         for light_source_index, light_source in iter_list_reverse(self.updating_light_sources):
             if light_source.to_remove:
-                self.remove_light_source(light_source)
-                del self.updating_light_sources[light_source_index]
+                self.remove_updating_light_source(light_source)
                 continue
 
             self.remove_updating_light_source(light_source)
