@@ -57,7 +57,6 @@ class PotionUnexploded:
         self.light_source: LightSource | None = LightSource(
             self.x, self.y, 255, 48
         )
-        shadows.add_light_source(self.light_source)
 
         self.damage: int = self.DAMAGE
 
