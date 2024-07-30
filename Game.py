@@ -64,17 +64,21 @@ class Game:
 
         self.enemy_handler.setup_enemies_from(self.map_data, self.map)
 
-    def step(self):
+    def step(self) -> None:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
                 self.window_closed = True
                 return
 
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    self.running = False
-                    return
+            # if event.type == pygame.KEYDOWN:
+            #     if event.key == pygame.K_ESCAPE:
+            #         self.running = False
+            #         return
+
+        if self.player.death_animation_finished:
+            self.running = False
+            return
 
         self.window.fill((127, 127, 127))
 
