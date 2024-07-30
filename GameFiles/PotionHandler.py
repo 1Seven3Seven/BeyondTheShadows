@@ -14,6 +14,10 @@ class PotionHandler:
         self.unexploded_potions: list[PotionUnexploded] = []
         self.exploded_potions: list[PotionExploded] = []
 
+    def clear_potions(self) -> None:
+        self.unexploded_potions = []
+        self.exploded_potions = []
+
     @staticmethod
     def iter_potions_reverse(potion_list: list[PotionUnexploded | PotionExploded]) \
             -> Generator[tuple[int, PotionUnexploded | PotionExploded], None, None]:
