@@ -153,6 +153,6 @@ class PotionExploded:
 
         pygame.draw.circle(camera.window, (255, 127, 0), display_coords, 10)
 
-        display_rect = self.rect.copy()
-        camera.convert_rect_to_camera_coordinates(display_rect)
-        pygame.draw.rect(camera.window, (255, 255, 255), display_rect, 1)
+        # display_rect = self.rect.copy()
+        # camera.convert_rect_to_camera_coordinates(display_rect)
+        # pygame.draw.rect(camera.window, (255, 255, 255), display_rect, 1)
