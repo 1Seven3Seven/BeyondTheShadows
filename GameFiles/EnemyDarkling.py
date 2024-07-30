@@ -1,5 +1,6 @@
 from .Camera import Camera
 from .Enemy import Enemy
+from .Helpers.CommonTypes import Coordinates
 from .Map import Map
 from .Player import Player
 from .PotionHandler import PotionHandler
