@@ -26,6 +26,9 @@ class Player(Entity):
     BRIGHTNESS: int = 255
     LIGHT_RADIUS: int = 64
 
+    DEATH_TIMER: int = 30
+    """How long the death animation lasts in frames."""
+
     @classmethod
     def increase_throw_velocity(cls, increase_by: int = 2):
         cls.THROW_VELOCITY += increase_by
@@ -44,6 +47,10 @@ class Player(Entity):
         self.light_source: LightSource = LightSource(self.rect.centerx, self.rect.centerx,
                                                      self.BRIGHTNESS, self.LIGHT_RADIUS)
 
+        self.i_am_dead: bool = False
+        self.death_animation_finished: bool = False
+        self.death_timer: int = self.DEATH_TIMER
+
     def setup_from(self, map_data: MapData, map_: Map):
         self.health = self.HEALTH
         self.attack_delay = self.ATTACK_DELAY
@@ -52,6 +59,11 @@ class Player(Entity):
             map_data.player_spawn[0] * map_.TILE_SIZE + map_.TILE_SIZE_2,
             map_data.player_spawn[1] * map_.TILE_SIZE + map_.TILE_SIZE_2
         )
+
+        # ALIVE, WOO!
+        self.i_am_dead = False
+        self.death_animation_finished = False
+        self.death_timer: int = self.DEATH_TIMER
 
     def _update_attack(self, keys: pygame.key.ScancodeWrapper, mouse_state: MouseSate,
                        potion_handler: PotionHandler, shadows: Shadows):
@@ -79,12 +91,40 @@ class Player(Entity):
 
         shadows.add_light_source(self.light_source)
 
+    def _begin_death(self) -> None:
+        if self.i_am_dead:
+            return
+
+        self.i_am_dead = True
+
+        # ToDo: do the necessary stuff to begin the death animation
+
+    def _update_death(self) -> None:
+        if self.death_animation_finished:
+            return
+
+        self._begin_death()
+
+        # ToDo: set death_animation_finished to true when finished dying
+        # For now, just last half a second
+        if self.death_timer > 0:
+            self.death_timer -= 1
+            return
+
+        self.death_animation_finished = True
+
     def update(self, keys: pygame.key.ScancodeWrapper, mouse_state: MouseSate,
                potion_handler: PotionHandler, shadows: Shadows):
-        self._update_attack(keys, mouse_state, potion_handler, shadows)
-        self._update_light_source(shadows)
+        if self.health > 0:
+            self._update_attack(keys, mouse_state, potion_handler, shadows)
+            self._update_light_source(shadows)
+        else:
+            self._update_death()
 
     def move(self, keys: pygame.key.ScancodeWrapper, map_: Map):
+        if self.i_am_dead:
+            return
+
         y_movement = 0
 
         if keys[pygame.K_UP] or keys[pygame.K_w]:
@@ -104,6 +144,10 @@ class Player(Entity):
         self.move_x(map_, x_movement)
 
     def draw(self, camera: Camera):
+        # No need to draw if, well I am dead
+        if self.i_am_dead:
+            return
+
         if not camera.can_see(self.rect):
             return
 
