@@ -17,6 +17,7 @@ class Player(Entity):
     HEIGHT: int = 50
 
     HEALTH: int = 100
+    """The initial starting health of the player."""
 
     ATTACK_DELAY: int = 45
     THROW_VELOCITY: int = 12  # I like a max of 18
