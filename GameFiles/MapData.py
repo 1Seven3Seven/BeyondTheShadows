@@ -7,6 +7,7 @@ from .Helpers.FileReading import read_keys_and_values_from
 _GeneralMapData = dict[str, list[str]]
 _RoomData = tuple[IntCoordinates, IntCoordinates]
 _EnemyData = tuple[str, IntCoordinates, int | None]
+_UpgradeData = tuple[str, IntCoordinates, IntCoordinates]
 
 
 class MapData:
@@ -37,6 +38,11 @@ class MapData:
         """
         Enemies are represented as their key, the tile they are to spawn in, and the room they are constrained to.
         If the room is None, then there is no constraint.
+        """
+
+        self.upgrades: list[_UpgradeData] = []
+        """
+        Upgrades are represented as their key, the tile they are to spawn in, and additional pixel movements.
         """
 
     def __str__(self, pretty: bool = False) -> str:
@@ -158,7 +164,10 @@ class MapData:
 
     @staticmethod
     def _process_enemy(enemy_str: str) -> _EnemyData:
-        enemy_key, tile_x, tile_y, room_id = enemy_str.split(",")
+        try:
+            enemy_key, tile_x, tile_y, room_id = enemy_str.split(",")
+        except ValueError:
+            raise ValueError("Error unpacking enemy string")
 
         try:
             tile_x = int(tile_x)
@@ -193,6 +202,43 @@ class MapData:
             empty_map_data.enemies.append(MapData._process_enemy(enemy_str))
 
     @staticmethod
+    def _process_upgrade(upgrade_str: str) -> _UpgradeData:
+        try:
+            upgrade_key, tile_x, tile_y, tile_offset_x, tile_offset_y = upgrade_str.split(",")
+        except ValueError:
+            raise ValueError("Error unpacking upgrade string")
+
+        try:
+            tile_x = int(tile_x)
+            tile_y = int(tile_y)
+        except ValueError:
+            raise ValueError(f"Could not parse upgrade string '{upgrade_key}' due to invalid tile coordinates")
+
+        try:
+            tile_offset_x = int(tile_offset_x)
+            tile_offset_y = int(tile_offset_y)
+        except ValueError:
+            raise ValueError(f"Could not parse upgrade string '{upgrade_key}' due to invalid tile offsets")
+
+        return upgrade_key, (tile_x, tile_y), (tile_offset_x, tile_offset_y)
+
+    @staticmethod
+    def _process_upgrades_into(map_data_keys_and_values: _GeneralMapData, empty_map_data: "MapData") -> None:
+        if empty_map_data.upgrades:
+            raise ValueError(f"When asked to process upgrades, given map data object already contains upgrades")
+
+        # Upgrades are completely optional
+        if "UPGRADES" not in map_data_keys_and_values:
+            return
+
+        data = map_data_keys_and_values["UPGRADES"]
+        if not data:
+            raise ValueError("Found no data for key 'UPGRADES'")
+
+        for upgrade_str in data:
+            empty_map_data.upgrades.append(MapData._process_upgrade(upgrade_str))
+
+    @staticmethod
     def from_file(path: pathlib.Path) -> "MapData":
         """
         Creates a MapData object from a .mapdata file.
@@ -213,6 +259,7 @@ class MapData:
         MapData._process_player_spawn_into(map_data_keys_and_values, map_data)
         MapData._process_rooms_into(map_data_keys_and_values, map_data)
         MapData._process_enemies_into(map_data_keys_and_values, map_data)
+        MapData._process_upgrades_into(map_data_keys_and_values, map_data)
 
         return map_data
 
