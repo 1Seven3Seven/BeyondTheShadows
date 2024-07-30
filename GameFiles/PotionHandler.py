@@ -60,6 +60,7 @@ class PotionHandler:
         )
 
     def _create_potion_exploded(self, potion: PotionUnexploded, shadows: Shadows) -> None:
-        self.exploded_potions.append(
-            PotionExploded(potion.x, potion.y, shadows)
-        )
+        exploded_potion = PotionExploded(potion.x, potion.y, shadows)
+        if potion.collided_with_enemy:
+            exploded_potion.health /= 5
+        self.exploded_potions.append(exploded_potion)

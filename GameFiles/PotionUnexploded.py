@@ -54,6 +54,9 @@ class PotionUnexploded:
         self.exploded: bool = False
         """If true, then this potion has exploded and should be removed."""
 
+        self.collided_with_enemy: bool = False
+        """If true then we collided with an enemy before exploding."""
+
         self.light_source: LightSource | None = LightSource(
             self.x, self.y, 255, 48
         )
@@ -94,6 +97,7 @@ class PotionUnexploded:
         for enemy in enemies:
             if self.rect.colliderect(enemy.rect):
                 enemy.deal_damage(self.damage)
+                self.collided_with_enemy = True
                 self.explode(shadows)
 
         # Check for collisions with tiles
