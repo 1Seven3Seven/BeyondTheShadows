@@ -5,6 +5,7 @@ import pygame
 from .Camera import Camera
 from .Entity import Entity
 from .Helpers import MouseSate
+from .Helpers.CommonTypes import Number
 from .LightSource import LightSource
 from .Map import Map
 from .PotionHandler import PotionHandler
@@ -21,8 +22,9 @@ class Player(Entity):
     BRIGHTNESS: int = 255
     LIGHT_RADIUS: int = 64
 
-    def __init__(self, shadows: Shadows):
-        super().__init__(300, 300, 50, 50, self.HEALTH)
+    def __init__(self, center_x: Number, center_y: Number, shadows: Shadows):
+        super().__init__(0, 0, 50, 50, self.HEALTH)
+        self.rect.center = center_x, center_y
 
         self.attack_delay = self.ATTACK_DELAY
         self.display_rect: pygame.Rect = self.rect.copy()

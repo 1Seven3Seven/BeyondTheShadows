@@ -22,7 +22,11 @@ class Game:
             self.map.height * self.map.TILE_SIZE // GameFiles.Shadows.TILE_SIZE
         )
 
-        self.player: GameFiles.Player = GameFiles.Player(self.shadows)
+        self.player: GameFiles.Player = GameFiles.Player(
+            self.map_data.player_spawn[0] * self.map.TILE_SIZE + self.map.TILE_SIZE_2,
+            self.map_data.player_spawn[1] * self.map.TILE_SIZE + self.map.TILE_SIZE_2,
+            self.shadows
+        )
 
         self.potion_handler: GameFiles.PotionHandler = GameFiles.PotionHandler()
 
