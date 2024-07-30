@@ -275,4 +275,5 @@ class Map:
             display_rect.topleft = tile_rect.topleft
             camera.convert_rect_to_camera_coordinates(display_rect)
 
-            pygame.draw.rect(camera.window, (255, 127, 127), display_rect)
+            # Used to be coloured (255, 127, 127)
+            pygame.draw.rect(camera.window, (64, 64, 96), display_rect)
