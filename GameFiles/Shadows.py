@@ -5,6 +5,7 @@ import pygame
 
 from .Camera import Camera
 from .LightSource import LightSource
+from .Map import Map
 
 
 class ShadowTile:
@@ -62,22 +63,25 @@ class Shadows:
     TILE_SIZE_2 = TILE_SIZE / 2
     """Half the tile size."""
 
-    def __init__(self, width: int, height: int):
-        """
-        :param width: The width in number of tiles.
-        :param height: The height in number of tiles.
-        """
+    def __init__(self):
+        self.width: int = 0
+        self.height: int = 0
 
-        self.tiles: list[list[ShadowTile]] = [
-            [
-                ShadowTile() for _ in range(width)
-            ] for _ in range(height)
-        ]
-
-        self.width: int = width
-        self.height: int = height
+        self.tiles: list[list[ShadowTile]] = []
 
         self.light_sources: list[LightSource] = []
+
+    def setup_for_map(self, map_: Map) -> None:
+        self.width = int(map_.width * map_.TILE_SIZE // self.TILE_SIZE)
+        self.height = int(map_.height * map_.TILE_SIZE // self.TILE_SIZE)
+
+        self.tiles = [
+            [
+                ShadowTile() for _ in range(self.width)
+            ] for _ in range(self.height)
+        ]
+
+        self.light_sources = []
 
     def _tiles_affected_by(self, light_source: LightSource) -> Generator[tuple[ShadowTile, float], None, None]:
         """
