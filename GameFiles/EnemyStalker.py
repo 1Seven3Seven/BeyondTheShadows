@@ -1,10 +1,12 @@
 import random
+from typing import Callable
 
 import pygame.draw
 
 from .Camera import Camera
 from .Enemy import Enemy
-from .Helpers.CommonTypes import Number, Coordinates
+from .Helpers import iter_list_reverse
+from .Helpers.CommonTypes import Number, Coordinates, IntCoordinates
 from .Map import Map
 from .Player import Player
 from .PotionHandler import PotionHandler
@@ -15,7 +17,7 @@ class EnemyStalker(Enemy):
     TARGET_RADIUS_SQUARED = TARGET_RADIUS * TARGET_RADIUS
     TARGET_TIME = 10
 
-    TARGET_DISTANCE_PLAYER = 128
+    TARGET_DISTANCE_PLAYER = 150
     TARGET_DISTANCE_PLAYER_SQUARED = TARGET_DISTANCE_PLAYER * TARGET_DISTANCE_PLAYER
 
     DAMAGE_TIME: int = 2
@@ -28,6 +30,10 @@ class EnemyStalker(Enemy):
         self.target_timer: int = self.TARGET_TIME + update_offset
 
         self.damage_timer: int = self.DAMAGE_TIME
+
+        self.room_tile_keys: list[IntCoordinates] | None = None
+        self._choose_new_tile_as_target: Callable[[Map], None] = self._choose_new_tile_as_target_no_room
+        self._target_player: Callable[[Player, Map], bool] = self._target_player_no_room
 
     def _distance_to_position_squared(self, position: Coordinates) -> tuple[Number, Number, Number]:
         """
@@ -43,9 +49,10 @@ class EnemyStalker(Enemy):
 
         return distance_to_target_squared, x_diff_squared, y_diff_squared
 
-    def _choose_new_tile_as_target(self, map_: Map) -> None:
+    def _choose_new_tile_as_target_no_room(self, map_: Map) -> None:
         """
         Chooses a tile as a target only if we are not at our target.
+        Runs assuming that we are not constrained to a room.
         """
 
         # If we are not at a target, then do not choose a new tile
@@ -53,21 +60,84 @@ class EnemyStalker(Enemy):
         if distance_to_target_squared >= self.TARGET_RADIUS_SQUARED:
             return
 
-        # Get keys for tiles that do not exist that surround the enemy
+        # Get keys for tiles that do not exist that surround the enemy, not including the one we are in
         my_tile_key = map_.tile_key_for_position(self.rect.center)
-        surrounding_tile_keys_that_exist = map_.surrounding_tile_keys(self.rect.centerx, self.rect.centery)
-        surrounding_tile_keys_that_dont_exist = list(
-            map_.iter_surrounding_tile_keys(self.rect.centerx, self.rect.centery))
-        for tile_key in surrounding_tile_keys_that_exist:
-            surrounding_tile_keys_that_dont_exist.remove(tile_key)
-        surrounding_tile_keys_that_dont_exist.remove(my_tile_key)
+        surrounding_empty_tile_keys = map_.surrounding_empty_tile_keys(self.rect.centerx, self.rect.centery)
+        surrounding_empty_tile_keys.remove(my_tile_key)
 
-        # Get a random choice for that key
-        target_tile_key = random.choice(surrounding_tile_keys_that_dont_exist)
+        # Get a random choice form those keys
+        target_tile_key = random.choice(surrounding_empty_tile_keys)
 
         # Set our target to the center of the tile
         self.target = (target_tile_key[0] * map_.TILE_SIZE + map_.TILE_SIZE_2,
                        target_tile_key[1] * map_.TILE_SIZE + map_.TILE_SIZE_2)
+
+    def _choose_new_tile_as_target_with_room(self, map_: Map) -> None:
+        """
+        Chooses a tile as a target only if we are not at our target.
+        Runs assuming that we are constrained to a room.
+        If there is no valid tile, then go to the center of the tile we are in.
+        """
+
+        # If we are not at a target, then do not choose a new tile
+        distance_to_target_squared, _, _ = self._distance_to_position_squared(self.target)
+        if distance_to_target_squared >= self.TARGET_RADIUS_SQUARED:
+            return
+
+        # Get keys for tiles that do not exist that surround the enemy, not including the one we are in
+        surrounding_empty_tile_keys = map_.surrounding_empty_tile_keys(self.rect.centerx, self.rect.centery)
+        my_tile_key = map_.tile_key_for_position(self.rect.center)
+        surrounding_empty_tile_keys.remove(my_tile_key)
+
+        # Remove any keys that are not in the room we are a part of
+        room_tile_key: IntCoordinates
+        for room_tile_key_index, room_tile_key in iter_list_reverse(surrounding_empty_tile_keys):
+            if room_tile_key not in self.room_tile_keys:
+                del surrounding_empty_tile_keys[room_tile_key_index]
+
+        # Get a random choice from those keys
+        target_tile_key: IntCoordinates
+        if surrounding_empty_tile_keys:
+            target_tile_key = random.choice(surrounding_empty_tile_keys)
+        # If there are no available keys, move to the center of the tile we are in
+        else:
+            target_tile_key = my_tile_key
+
+        # Set our target to the center of the tile
+        self.target = (target_tile_key[0] * map_.TILE_SIZE + map_.TILE_SIZE_2,
+                       target_tile_key[1] * map_.TILE_SIZE + map_.TILE_SIZE_2)
+
+    def _target_player_no_room(self, player: Player, map_: Map) -> bool:
+        """
+        Targets the player if they can be seen.
+        Return true if the player has been targeted.
+        """
+
+        distance_to_player_squared, *_ = self._distance_to_position_squared(player.rect.center)
+
+        if distance_to_player_squared < self.TARGET_DISTANCE_PLAYER_SQUARED:
+            self.target = player.rect.center
+            return True
+        return False
+
+    def _target_player_with_room(self, player: Player, map_: Map) -> bool:
+        """
+        Targets the player if they are in the room we are constrained to or if they can be seen.
+        Return true if the player has been targeted.
+        """
+
+        player_tile_key = map_.tile_key_for_position(player.rect.center)
+
+        if player_tile_key in self.room_tile_keys:
+            self.target = player.rect.center
+            return True
+
+        distance_to_player_squared, *_ = self._distance_to_position_squared(player.rect.center)
+        if distance_to_player_squared < self.TARGET_DISTANCE_PLAYER_SQUARED:
+            self.target = player.rect.center
+            return True
+
+        return False
 
     def _update_target(self, player: Player, map_: Map) -> None:
         if self.target_timer > 0:
@@ -75,15 +145,9 @@ class EnemyStalker(Enemy):
             return
         self.target_timer = self.TARGET_TIME
 
-        _temp = self._distance_to_position_squared(player.rect.center)
-        distance_to_player_squared, *_ = _temp
-
-        # If we can see the player, target the player
-        if distance_to_player_squared < self.TARGET_DISTANCE_PLAYER_SQUARED:
-            self.target = player.rect.center
-        # If we cannot see the player, chose a random tile to move to
-        else:
-            self._choose_new_tile_as_target(map_)
+        if self._target_player(player, map_):
+            return
+        self._choose_new_tile_as_target(map_)
 
     def _damage_player(self, player: Player) -> None:
         if self.rect.colliderect(player.rect):
@@ -130,12 +194,23 @@ class EnemyStalker(Enemy):
         pygame.draw.circle(camera.window, (255, 0, 255), camera_coords, 16)
 
         # Drawing the target
-        # camera_coords = camera.coordinates_to_display_coordinates(self.target)
-        # pygame.draw.circle(camera.window, (255, 0, 0), camera_coords, 5)
+        camera_coords = camera.coordinates_to_display_coordinates(self.target)
+        pygame.draw.circle(camera.window, (255, 0, 0), camera_coords, 5)
 
     def set_room_id(self, room_id: int, map_: Map) -> None:
-        # ToDo: actually implement this
-        pass
+        """
+        Sets the room to be constrained to.
+        If the given room id is -1, then clears the set room if it exists.
+        """
+
+        if room_id == -1:
+            self.room_tile_keys = None
+            self._choose_new_tile_as_target = self._choose_new_tile_as_target_no_room
+            self._target_player = self._target_player_no_room
+        else:
+            self.room_tile_keys = map_.rooms[room_id]
+            self._choose_new_tile_as_target = self._choose_new_tile_as_target_with_room
+            self._target_player = self._target_player_with_room
 
     def set_center(self, coords: Coordinates):
         self.rect.center = coords
