@@ -154,3 +154,47 @@ Maybe...
 -- The other enemies.
 
 ...
+
+My thoughts are a bit jumbled, so I will do this a little earlier than usual.
+
+I have confined the stalkers to their rooms, if they are outside by more than one tile, then they just stay still.  
+If the player is in the same room, then the stalker can see them regardless of the distance.  
+Not exactly what I said before, but I like this.
+
+The mapdata file has been upgraded to include upgrades.  
+These upgrades can now exist within the game world and be collected.
+
+So, next...  
+Well the player still cannot die.  
+That needs to be fixed.  
+There is also a lack of a clear objective.  
+A simple one is to kill all the enemies.  
+I can slap a counter on the screen to show how many are left.  
+Another one is to collect all the upgrades.  
+A clear-cut one is to kill a final boss, but that requires implementing, and there is not a super amount of time to do
+that.
+
+A very basic hud can be made to show this information, alongside health and cooldown for throwing potions.
+
+If the player is killed, one of two things can happen, restart the game immediately.  
+Or have a title screen to return to.  
+I like the idea of a title screen, but that will take more time, so for now, immediate restart.
+
+Beautification should still happen.  
+I have not forgotten.  
+This will include simple sound effects for most actions.  
+Throwing potion, potion exploding, enemy dying, potion fizzling out (maybe), the like.  
+Also more particles.  
+When enemies die, when potions fizzle out.  
+I also want the exploded potion light to disappear slowly, not straight away.  
+Should not be the most difficult...
+
+So, to make things simple:  
+-- Allow the player to be killed.
+-- Restart the game when this happens.  
+-- Create a basic hud/ui.  
+-- Beautification.
+-- Boss monster.
+-- More beautification. 
+
+...
