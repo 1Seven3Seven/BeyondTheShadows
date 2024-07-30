@@ -30,6 +30,9 @@ class MapData:
         Rooms can overlap.
         """
 
+        self.player_spawn: IntCoordinates | None = None
+        """The tile that the player should spawn in."""
+
         self.enemies: list[_EnemyData] = []
         """
         Enemies are represented as their key, the tile they are to spawn in, and the room they are constrained to.
@@ -75,7 +78,7 @@ class MapData:
         try:
             width, height = data.split(",")
         except ValueError:
-            raise ValueError(f"Expected data formatted as 'WIDTH,HEIGHT' but got '{data}'")
+            raise ValueError(f"Expected dimensions formatted as 'WIDTH,HEIGHT' but got '{data}'")
 
         try:
             width = int(width)
@@ -88,18 +91,44 @@ class MapData:
     @staticmethod
     def _process_tile_data_into(map_data_keys_and_values: _GeneralMapData, empty_map_data: "MapData") -> None:
         if "TILE_DATA" not in map_data_keys_and_values:
-            raise ValueError(f"Could not find key 'TILE_DATA' in map data")
+            raise ValueError("Could not find key 'TILE_DATA' in map data")
 
         data = map_data_keys_and_values["TILE_DATA"]
         if len(data) != empty_map_data.height:
-            raise ValueError(f"Data height {len(data)} does not match expected height {empty_map_data.height}.")
+            raise ValueError(f"Tile Data height {len(data)} does not match expected height {empty_map_data.height}.")
 
         for row_index, row in enumerate(data):
             if len(row) != empty_map_data.width:
-                raise ValueError(f"Data width {len(row)} does not match expected width {empty_map_data.width}.")
+                raise ValueError(f"Tile Data width {len(row)} does not match expected width {empty_map_data.width}.")
 
             for column_index in range(empty_map_data.width):
                 empty_map_data.tiles[row_index][column_index] = int(row[column_index])
+
+    @staticmethod
+    def _process_player_spawn_into(map_data_keys_and_values: _GeneralMapData, empty_map_data: "MapData") -> None:
+        if empty_map_data.player_spawn is not None:
+            raise ValueError("When processing player spawn, given map data object already contains player spawn data")
+
+        if "PLAYER_SPAWN" not in map_data_keys_and_values:
+            raise ValueError("Could not find key 'PLAYER_SPAWN' in map data")
+
+        data = map_data_keys_and_values["PLAYER_SPAWN"]
+        if len(data) != 1:
+            raise ValueError(f"Expected one line of data for key 'PLAYER_SPAWN' but found {len(data)}")
+        data = data[0]
+
+        try:
+            tile_x, tile_y = data.split(",")
+        except ValueError:
+            raise ValueError(f"Expected player spawn formatted as 'TILE_X,TILE_Y' but got '{data}'")
+
+        try:
+            tile_x = int(tile_x)
+            tile_y = int(tile_y)
+        except ValueError:
+            raise ValueError(f"Error when attempting to convert player spawn tile x and y into integers")
+
+        empty_map_data.player_spawn = tile_x, tile_y
 
     @staticmethod
     def _process_room(room_str: str) -> _RoomData:
@@ -181,6 +210,7 @@ class MapData:
 
         map_data = MapData(*MapData._process_width_and_height(map_data_keys_and_values))
         MapData._process_tile_data_into(map_data_keys_and_values, map_data)
+        MapData._process_player_spawn_into(map_data_keys_and_values, map_data)
         MapData._process_rooms_into(map_data_keys_and_values, map_data)
         MapData._process_enemies_into(map_data_keys_and_values, map_data)
 
