@@ -13,14 +13,23 @@ class Game:
         self.running = True
         """Is True whilst the game is running."""
 
+        self.camera: GameFiles.Camera = GameFiles.Camera(self.window)
+
+        self.particle_handler: GameFiles.ParticleHandler = GameFiles.ParticleHandler()
+        self.particle_handler.add_particle_directory(pathlib.Path("GameFiles/Particles"))
+
         self.map_data: GameFiles.MapData = GameFiles.MapData.from_file(pathlib.Path("GameFiles/Maps/test.mapdata"))
 
         self.map: GameFiles.Map = GameFiles.Map(self.map_data)
+
+        self.camera.set_min_max_position(*self.map.min_max_positions())
 
         self.shadows: GameFiles.Shadows = GameFiles.Shadows(
             self.map.width * self.map.TILE_SIZE // GameFiles.Shadows.TILE_SIZE,
             self.map.height * self.map.TILE_SIZE // GameFiles.Shadows.TILE_SIZE
         )
+
+        self.potion_handler: GameFiles.PotionHandler = GameFiles.PotionHandler()
 
         self.player: GameFiles.Player = GameFiles.Player(
             self.map_data.player_spawn[0] * self.map.TILE_SIZE + self.map.TILE_SIZE_2,
@@ -28,10 +37,8 @@ class Game:
             self.shadows
         )
 
-        self.potion_handler: GameFiles.PotionHandler = GameFiles.PotionHandler()
-
-        self.particle_handler: GameFiles.ParticleHandler = GameFiles.ParticleHandler()
-        self.particle_handler.add_particle_directory(pathlib.Path("GameFiles/Particles"))
+        self.upgrade_handler: GameFiles.UpgradeHandler = GameFiles.UpgradeHandler()
+        self.upgrade_handler.setup_upgrades_from(self.map_data, self.map)
 
         self.enemy_handler: GameFiles.EnemyHandler = GameFiles.EnemyHandler()
         self.enemy_handler.setup_enemies_from(self.map_data, self.map)
@@ -39,9 +46,6 @@ class Game:
         #     GameFiles.BasicEnemy(200, 200),
         #     GameFiles.EnemyStalker(300, 300)
         # ])
-
-        self.camera: GameFiles.Camera = GameFiles.Camera(self.window)
-        self.camera.set_min_max_position(*self.map.min_max_positions())
 
     def step(self):
         for event in pygame.event.get():
@@ -73,6 +77,8 @@ class Game:
         self.player.draw(self.camera)
         self.map.draw(self.camera)
         self.potion_handler.draw(self.camera)
+
+        self.upgrade_handler.update_and_draw_upgrades(self.player, self.camera)
 
         self.enemy_handler.update_move_and_draw_enemies(self.player, self.map, self.potion_handler, self.camera)
 
