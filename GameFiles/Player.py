@@ -5,14 +5,17 @@ import pygame
 from .Camera import Camera
 from .Entity import Entity
 from .Helpers import MouseSate
-from .Helpers.CommonTypes import Number
 from .LightSource import LightSource
 from .Map import Map
+from .MapData import MapData
 from .PotionHandler import PotionHandler
 from .Shadows import Shadows
 
 
 class Player(Entity):
+    WIDTH: int = 50
+    HEIGHT: int = 50
+
     HEALTH: int = 100
 
     ATTACK_DELAY: int = 45
@@ -32,16 +35,23 @@ class Player(Entity):
             return True
         return False
 
-    def __init__(self, center_x: Number, center_y: Number, shadows: Shadows):
-        super().__init__(0, 0, 50, 50, self.HEALTH)
-        self.rect.center = center_x, center_y
+    def __init__(self):
+        super().__init__(0, 0, self.WIDTH, self.HEALTH, self.HEALTH)
 
         self.attack_delay = self.ATTACK_DELAY
         self.display_rect: pygame.Rect = self.rect.copy()
 
         self.light_source: LightSource = LightSource(self.rect.centerx, self.rect.centerx,
                                                      self.BRIGHTNESS, self.LIGHT_RADIUS)
-        shadows.add_light_source(self.light_source)
+
+    def setup_from(self, map_data: MapData, map_: Map):
+        self.rect.center = (
+            map_data.player_spawn[0] * map_.TILE_SIZE + map_.TILE_SIZE_2,
+            map_data.player_spawn[1] * map_.TILE_SIZE + map_.TILE_SIZE_2
+        )
+
+        super().__init__(0, 0, self.WIDTH, self.HEALTH, self.HEALTH)
+        self.attack_delay = self.ATTACK_DELAY
 
     def _update_attack(self, keys: pygame.key.ScancodeWrapper, mouse_state: MouseSate,
                        potion_handler: PotionHandler, shadows: Shadows):
@@ -62,7 +72,6 @@ class Player(Entity):
         self.attack_delay = self.ATTACK_DELAY
 
     def _update_light_source(self, shadows: Shadows) -> None:
-
         shadows.remove_light_source(self.light_source)
 
         self.light_source.x = self.rect.centerx
