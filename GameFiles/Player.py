@@ -36,7 +36,7 @@ class Player(Entity):
         return False
 
     def __init__(self):
-        super().__init__(0, 0, self.WIDTH, self.HEALTH, self.HEALTH)
+        super().__init__(0, 0, self.WIDTH, self.HEIGHT, self.HEALTH)
 
         self.attack_delay = self.ATTACK_DELAY
         self.display_rect: pygame.Rect = self.rect.copy()
@@ -50,7 +50,7 @@ class Player(Entity):
             map_data.player_spawn[1] * map_.TILE_SIZE + map_.TILE_SIZE_2
         )
 
-        super().__init__(0, 0, self.WIDTH, self.HEALTH, self.HEALTH)
+        super().__init__(0, 0, self.WIDTH, self.HEIGHT, self.HEALTH)
         self.attack_delay = self.ATTACK_DELAY
 
     def _update_attack(self, keys: pygame.key.ScancodeWrapper, mouse_state: MouseSate,
