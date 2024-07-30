@@ -106,6 +106,7 @@ class Game:
 
         self.particle_handler.update_and_draw_particles(self.camera)
 
+        self.shadows.update()
         self.shadows.render(self.camera)
 
         self.user_interface.update(self.player, self.upgrade_handler, self.enemy_handler)
