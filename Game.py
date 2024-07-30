@@ -93,8 +93,8 @@ class Game:
         self.camera.center_on(self.player.rect)
 
         self.player.draw(self.camera)
-        self.map.draw(self.camera)
         self.potion_handler.draw(self.camera)
+        self.map.draw(self.camera)
 
         self.upgrade_handler.update_and_draw_upgrades(self.player, self.camera)
 
