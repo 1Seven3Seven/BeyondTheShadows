@@ -14,9 +14,17 @@ from .Shadows import Shadows
 
 from .PotionUnexploded import PotionUnexploded
 from .PotionExploded import PotionExploded
+
 from .PotionHandler import PotionHandler
 
 from .Player import Player
+
+from .UpgradeDirectDamage import UpgradeDirectDamage
+from .UpgradeExplodedPotionLifespan import UpgradeExplodedPotionLifespan
+from .UpgradeLightRadius import UpgradeLightRadius
+from .UpgradeThrowVelocity import UpgradeThrowVelocity
+
+from .UpgradeHandler import UpgradeHandler
 
 from .BasicEnemy import BasicEnemy
 from .EnemyStalker import EnemyStalker
