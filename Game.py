@@ -17,6 +17,7 @@ class Game:
         """Set to True if the user attempted to close the game window."""
 
         self.camera: GameFiles.Camera = GameFiles.Camera(self.window)
+        self.camera.rect.height -= 100  # Accommodating the ui
 
         self.particle_handler: GameFiles.ParticleHandler = GameFiles.ParticleHandler()
         self.particle_handler.add_particle_directory(pathlib.Path("GameFiles/Particles"))
@@ -28,6 +29,7 @@ class Game:
         self.player: GameFiles.Player = GameFiles.Player()
         self.upgrade_handler: GameFiles.UpgradeHandler = GameFiles.UpgradeHandler()
         self.enemy_handler: GameFiles.EnemyHandler = GameFiles.EnemyHandler()
+        self.user_interface: GameFiles.UserInterface = GameFiles.UserInterface()
 
         self.generate_from_map_data(pathlib.Path("GameFiles/Maps/test.mapdata"))
 
@@ -63,6 +65,8 @@ class Game:
         self.upgrade_handler.setup_upgrades_from(self.map_data, self.map)
 
         self.enemy_handler.setup_enemies_from(self.map_data, self.map)
+
+        self.user_interface.setup_from(self.map_data, self.upgrade_handler, self.enemy_handler, self.window)
 
     def step(self) -> None:
         for event in pygame.event.get():
@@ -103,6 +107,9 @@ class Game:
         self.particle_handler.update_and_draw_particles(self.camera)
 
         self.shadows.render(self.camera)
+
+        self.user_interface.update(self.player, self.upgrade_handler, self.enemy_handler)
+        self.user_interface.render(self.window)
 
         pygame.display.flip()
 
