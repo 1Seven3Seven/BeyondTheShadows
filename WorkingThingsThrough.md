@@ -227,3 +227,50 @@ Summary:
 -- Boss monster.
 
 ...
+
+Okay, so last entry for this sprint.
+
+I have added shrinking lights, they look quite cool I think.  
+When the player dies, their light shrinks.  
+When the exploded potions wear out, their light shrinks.  
+They also explode with some particles, I think this looks cool as well.  
+The more particles the better.
+
+A bunch of things can do with more particles.  
+-- Unexploded potions flying through the air.  
+-- Unexploded potions hitting an enemy.  
+-- Player death.  
+-- Collecting an upgrade.  
+Those are the main ones I can think of right now.
+
+I want to implement the basic enemy rendering code into the stalker.  
+I like it, and it is better than purple circle.
+
+Things could do with sprites to make it cleaner.  
+-- The potions that are thrown, and on the ui.  
+-- The exploded potion on the floor.  
+-- The upgrades.
+
+Actually, whilst I am thinking about it, give the upgrades light sources.
+
+Sound effects will give things a bit more flare as well.
+Some simple ones.  
+-- When a potion is thrown.  
+-- When a potion hits something.  
+-- When you collect an upgrade.  
+-- When you take damage.  
+-- When you die.  
+-- When an enemy dies.
+
+And maybe some others, I cannot think of anything right now.
+
+So in summary:
+-- More particles.  
+-- Change rendering code in stalker to be that of basic enemy.  
+-- Add some sound effects.
+
+See above entry for extra stuff to do.  
+I am pretty sure that I will not have time for the boss, but ehh.  
+I have put a lot of work into this, and am proud of where it is.
+
+...
