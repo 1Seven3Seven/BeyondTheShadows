@@ -45,13 +45,14 @@ class Player(Entity):
                                                      self.BRIGHTNESS, self.LIGHT_RADIUS)
 
     def setup_from(self, map_data: MapData, map_: Map):
+
+        super().__init__(0, 0, self.WIDTH, self.HEIGHT, self.HEALTH)
+        self.attack_delay = self.ATTACK_DELAY
+
         self.rect.center = (
             map_data.player_spawn[0] * map_.TILE_SIZE + map_.TILE_SIZE_2,
             map_data.player_spawn[1] * map_.TILE_SIZE + map_.TILE_SIZE_2
         )
-
-        super().__init__(0, 0, self.WIDTH, self.HEIGHT, self.HEALTH)
-        self.attack_delay = self.ATTACK_DELAY
 
     def _update_attack(self, keys: pygame.key.ScancodeWrapper, mouse_state: MouseSate,
                        potion_handler: PotionHandler, shadows: Shadows):
