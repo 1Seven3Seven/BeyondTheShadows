@@ -71,9 +71,6 @@ class Game:
 
         self.camera.center_on(self.player.rect)
 
-        if keys_just_pressed[pygame.K_SPACE]:
-            GameFiles.PotionExploded.increase_light_radius()
-
         self.player.draw(self.camera)
         self.map.draw(self.camera)
         self.potion_handler.draw(self.camera)
@@ -81,10 +78,6 @@ class Game:
         self.upgrade_handler.update_and_draw_upgrades(self.player, self.camera)
 
         self.enemy_handler.update_move_and_draw_enemies(self.player, self.map, self.potion_handler, self.camera)
-
-        if keys[pygame.K_BACKSPACE]:
-            if self.shadows.light_sources:
-                self.shadows.remove_light_source(self.shadows.light_sources[0])
 
         self.particle_handler.update_and_draw_particles(self.camera)
 
