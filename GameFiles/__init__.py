@@ -10,6 +10,7 @@ from .Map import Map
 from .Entity import Entity
 
 from .LightSource import LightSource
+from .ShadowTile import ShadowTile
 from .Shadows import Shadows
 
 from .PotionUnexploded import PotionUnexploded
