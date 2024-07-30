@@ -10,6 +10,9 @@ from .Map import Map
 from .Entity import Entity
 
 from .LightSource import LightSource
+from .UpdatingLightSource import UpdatingLightSource
+from .ShrinkingLightSource import ShrinkingLightSource
+
 from .ShadowTile import ShadowTile
 from .Shadows import Shadows
 
