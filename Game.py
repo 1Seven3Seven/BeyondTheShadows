@@ -18,34 +18,46 @@ class Game:
         self.particle_handler: GameFiles.ParticleHandler = GameFiles.ParticleHandler()
         self.particle_handler.add_particle_directory(pathlib.Path("GameFiles/Particles"))
 
-        self.map_data: GameFiles.MapData = GameFiles.MapData.from_file(pathlib.Path("GameFiles/Maps/test.mapdata"))
+        self.map_data: GameFiles.MapData | None = None
+        self.map: GameFiles.Map = GameFiles.Map()
+        self.shadows: GameFiles.Shadows = GameFiles.Shadows()
+        self.potion_handler: GameFiles.PotionHandler = GameFiles.PotionHandler()
+        self.player: GameFiles.Player = GameFiles.Player()
+        self.upgrade_handler: GameFiles.UpgradeHandler = GameFiles.UpgradeHandler()
+        self.enemy_handler: GameFiles.EnemyHandler = GameFiles.EnemyHandler()
 
-        self.map: GameFiles.Map = GameFiles.Map(self.map_data)
+        self.generate_from_map_data(pathlib.Path("GameFiles/Maps/test.mapdata"))
+
+    def generate_from_map_data(self, map_data_file: pathlib.Path) -> None:
+        """
+        Generates everything from the map data file.
+        """
+
+        self.map_data = GameFiles.MapData.from_file(map_data_file)
+
+        self.regenerate_with_stored_map_data()
+
+    def regenerate_with_stored_map_data(self) -> None:
+        """
+        Regenerates everything from the stored map data object.
+        """
+
+        if self.map_data is None:
+            raise ValueError("No internal map data object to regenerate from.")
+
+        self.map.generate_from(self.map_data)
 
         self.camera.set_min_max_position(*self.map.min_max_positions())
 
-        self.shadows: GameFiles.Shadows = GameFiles.Shadows(
-            self.map.width * self.map.TILE_SIZE // GameFiles.Shadows.TILE_SIZE,
-            self.map.height * self.map.TILE_SIZE // GameFiles.Shadows.TILE_SIZE
-        )
+        self.shadows.setup_for_map(self.map)
 
-        self.potion_handler: GameFiles.PotionHandler = GameFiles.PotionHandler()
+        self.potion_handler.clear_potions()
 
-        self.player: GameFiles.Player = GameFiles.Player(
-            self.map_data.player_spawn[0] * self.map.TILE_SIZE + self.map.TILE_SIZE_2,
-            self.map_data.player_spawn[1] * self.map.TILE_SIZE + self.map.TILE_SIZE_2,
-            self.shadows
-        )
+        self.player.setup_from(self.map_data, self.map)
 
-        self.upgrade_handler: GameFiles.UpgradeHandler = GameFiles.UpgradeHandler()
         self.upgrade_handler.setup_upgrades_from(self.map_data, self.map)
 
-        self.enemy_handler: GameFiles.EnemyHandler = GameFiles.EnemyHandler()
         self.enemy_handler.setup_enemies_from(self.map_data, self.map)
-        # self.enemy_handler.enemies.extend([
-        #     GameFiles.BasicEnemy(200, 200),
-        #     GameFiles.EnemyStalker(300, 300)
-        # ])
 
     def step(self):
         for event in pygame.event.get():
