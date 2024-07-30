@@ -23,6 +23,12 @@
 100000000000001
 111111111111111
 
+:PLAYER_SPAWN
+# The tile that the player should spawn in
+# Formatted simply as
+# TILE_X,TILE_Y
+1,1
+
 :ROOMS
 # Rectangular sections of the map
 # These are used to constrain the movement of enemies
