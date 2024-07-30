@@ -10,6 +10,7 @@ from .Map import Map
 from .MapData import MapData
 from .PotionHandler import PotionHandler
 from .Shadows import Shadows
+from .ShrinkingLightSource import ShrinkingLightSource
 
 
 class Player(Entity):
@@ -27,7 +28,7 @@ class Player(Entity):
     BRIGHTNESS: int = 255
     LIGHT_RADIUS: int = 64
 
-    DEATH_TIMER: int = 30
+    DEATH_TIMER: int = 90
     """How long the death animation lasts in frames."""
 
     @classmethod
@@ -92,19 +93,25 @@ class Player(Entity):
 
         shadows.add_light_source(self.light_source)
 
-    def _begin_death(self) -> None:
+    def _begin_death(self, shadows: Shadows) -> None:
         if self.i_am_dead:
             return
 
         self.i_am_dead = True
 
         # ToDo: do the necessary stuff to begin the death animation
+        shadows.remove_light_source(self.light_source)
+        shadows.add_updating_light_source(
+            ShrinkingLightSource(self.rect.centerx, self.rect.centery,
+                                 self.BRIGHTNESS, self.LIGHT_RADIUS,
+                                 self.DEATH_TIMER)
+        )
 
-    def _update_death(self) -> None:
+    def _update_death(self, shadows: Shadows) -> None:
         if self.death_animation_finished:
             return
 
-        self._begin_death()
+        self._begin_death(shadows)
 
         # ToDo: set death_animation_finished to true when finished dying
         # For now, just last half a second
@@ -120,7 +127,7 @@ class Player(Entity):
             self._update_attack(keys, mouse_state, potion_handler, shadows)
             self._update_light_source(shadows)
         else:
-            self._update_death()
+            self._update_death(shadows)
 
     def move(self, keys: pygame.key.ScancodeWrapper, map_: Map):
         if self.i_am_dead:
