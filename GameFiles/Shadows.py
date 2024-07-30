@@ -4,6 +4,7 @@ from typing import Generator
 import pygame
 
 from .Camera import Camera
+from .Helpers import iter_list_reverse
 from .LightSource import LightSource
 from .Map import Map
 from .ShadowTile import ShadowTile
@@ -24,6 +25,7 @@ class Shadows:
         self.tiles: list[list[ShadowTile]] = []
 
         self.light_sources: list[LightSource] = []
+        self.updating_light_sources: list[UpdatingLightSource] = []
 
     def setup_for_map(self, map_: Map) -> None:
         self.width = int(map_.width * map_.TILE_SIZE // self.TILE_SIZE)
@@ -98,6 +100,33 @@ class Shadows:
         # Update any affected tiles
         for affected_tile, _ in self._tiles_affected_by(light_source):
             affected_tile.remove_light_source(light_source)
+
+    def add_updating_light_source(self, updating_light_source: UpdatingLightSource) -> None:
+        self.updating_light_sources.append(updating_light_source)
+
+        for affected_tile, distance_squared in self._tiles_affected_by(updating_light_source):
+            affected_tile.add_light_source(updating_light_source, math.sqrt(distance_squared))
+
+    def remove_updating_light_source(self, updating_light_source: UpdatingLightSource) -> None:
+        if updating_light_source not in self.updating_light_sources:
+            return
+
+        self.updating_light_sources.remove(updating_light_source)
+
+        for affected_tile, _ in self._tiles_affected_by(updating_light_source):
+            affected_tile.remove_light_source(updating_light_source)
+
+    def update(self) -> None:
+        light_source: UpdatingLightSource
+        for light_source_index, light_source in iter_list_reverse(self.updating_light_sources):
+            if light_source.to_remove:
+                self.remove_light_source(light_source)
+                del self.updating_light_sources[light_source_index]
+                continue
+
+            self.remove_updating_light_source(light_source)
+            light_source.update()
+            self.add_updating_light_source(light_source)
 
     def render(self, camera: Camera) -> None:
         tile_surface = pygame.Surface((self.TILE_SIZE, self.TILE_SIZE))
