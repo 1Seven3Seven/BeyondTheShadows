@@ -181,6 +181,17 @@ class Map:
 
         return tile_keys
 
+    def surrounding_empty_tile_keys(self, x: Number, y: Number) -> list[_TileKey]:
+        """
+        Given a position, return all the keys for tiles that do not exist surrounding it.
+        """
+
+        tile_keys = []
+        for tile_key in self.iter_surrounding_tile_keys(x, y):
+            if tile_key not in self.tiles:
+                tile_keys.append(tile_key)
+        return tile_keys
+
     def surrounding_tiles(self, x: Number, y: Number) -> list[pygame.Rect]:
         """
         Given a position, return all tiles that exist surrounding it.
