@@ -45,8 +45,7 @@ class Player(Entity):
                                                      self.BRIGHTNESS, self.LIGHT_RADIUS)
 
     def setup_from(self, map_data: MapData, map_: Map):
-
-        super().__init__(0, 0, self.WIDTH, self.HEIGHT, self.HEALTH)
+        self.health = self.HEALTH
         self.attack_delay = self.ATTACK_DELAY
 
         self.rect.center = (
