@@ -195,6 +195,35 @@ So, to make things simple:
 -- Create a basic hud/ui.  
 -- Beautification.  
 -- Boss monster.  
--- More beautification. 
+-- More beautification.
+
+...
+
+The player can now die.  
+Their immortality has been removed.  
+The game allows time for a death animation and then restarts.
+
+I also created a very basic ui, showing the health, potion cooldown and remaining enemies and upgrades left.  
+It is not the bets of things, but it is there at least.
+
+What to do next?  
+Well the beautification.  
+Add more particles to everything.  
+Add the shrinking light sources when the potions run out and the player dies.  
+Add in sound effects.
+
+If there is time, although I doubt this, attempt to create the boss monster.
+
+Oh, and potentially make a map for the submission.
+
+Ahh, and make an end screen thingy, for when all enemies are dead and upgrades collected.
+
+Summary:  
+-- Beautification.  
+---- Particles.  
+---- Shrinking lights.  
+---- Sound effects.  
+-- End screen.  
+-- Boss monster.
 
 ...
