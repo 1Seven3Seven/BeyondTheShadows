@@ -32,3 +32,5 @@ from .EnemyConsumer import EnemyConsumer
 from .EnemyDarkling import EnemyDarkling
 
 from .EnemyHandler import EnemyHandler
+
+from .UserInterface import UserInterface
