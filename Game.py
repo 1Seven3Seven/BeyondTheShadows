@@ -13,6 +13,9 @@ class Game:
         self.running = True
         """Is True whilst the game is running."""
 
+        self.window_closed: bool = False
+        """Set to True if the user attempted to close the game window."""
+
         self.camera: GameFiles.Camera = GameFiles.Camera(self.window)
 
         self.particle_handler: GameFiles.ParticleHandler = GameFiles.ParticleHandler()
@@ -45,6 +48,8 @@ class Game:
         if self.map_data is None:
             raise ValueError("No internal map data object to regenerate from.")
 
+        self.running = True
+
         self.map.generate_from(self.map_data)
 
         self.camera.set_min_max_position(*self.map.min_max_positions())
@@ -63,6 +68,7 @@ class Game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
+                self.window_closed = True
                 return
 
             if event.type == pygame.KEYDOWN:
@@ -106,8 +112,11 @@ def main():
 
     game = Game(window)
 
-    while game.running:
-        game.step()
+    while not game.window_closed:
+        while game.running:
+            game.step()
+
+        game.regenerate_with_stored_map_data()
 
 
 if __name__ == "__main__":
