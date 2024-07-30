@@ -14,6 +14,7 @@ class PotionExploded:
     # Light source stats
     BRIGHTNESS: int = 300
     LIGHT_RADIUS: int = 80  # I like 80 as a start, and 128 as the max
+    MAX_LIGHT_RADIUS: int = 128
     LIGHT_RADIUS_SQRT_2 = int(LIGHT_RADIUS * math.sqrt(2))
 
     PARTICLE_SPAWN_TIME: int = 5
@@ -25,6 +26,7 @@ class PotionExploded:
     The 'health' of the potion.
     An exploded potions 'health' gets drained when it causes damage to enemies.
     """
+    MAX_HEALTH: int = 200
 
     DAMAGE: int = 1
     """
@@ -38,13 +40,35 @@ class PotionExploded:
     # Note the max damage delt via exposure is HEALTH * DAMAGE
 
     @classmethod
-    def increase_light_radius(cls, increase_by: int = 16) -> None:
+    def increase_light_radius(cls, increase_by: int = 16) -> bool:
+        """
+        Attempts to increase the light radius of the potion.
+        If at max radius, then True is returned.
+        """
+
         cls.LIGHT_RADIUS += increase_by
+
+        if cls.LIGHT_RADIUS > cls.MAX_LIGHT_RADIUS:
+            cls.LIGHT_RADIUS = cls.MAX_LIGHT_RADIUS
+            cls.LIGHT_RADIUS_SQRT_2 = cls.LIGHT_RADIUS * math.sqrt(2)
+            return True
+
         cls.LIGHT_RADIUS_SQRT_2 = cls.LIGHT_RADIUS * math.sqrt(2)
+        return False
 
     @classmethod
-    def increase_health(cls, increase_by: int = 50) -> None:
+    def increase_health(cls, increase_by: int = 50) -> bool:
+        """
+        Attempts to increase the health of the potion.
+        If at max health, then True is returned.
+        """
+
         cls.HEALTH += increase_by
+
+        if cls.HEALTH >= cls.MAX_HEALTH:
+            cls.HEALTH = cls.MAX_HEALTH
+            return True
+        return False
 
     def __init__(self, x: int | float, y: int | float, shadows: Shadows, update_offset: int = 0):
         self.x = x

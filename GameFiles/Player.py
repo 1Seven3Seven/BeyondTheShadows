@@ -15,12 +15,22 @@ from .Shadows import Shadows
 class Player(Entity):
     HEALTH: int = 100
 
-    ATTACK_DELAY: int = 30
-    THROW_VELOCITY: int = 12
+    ATTACK_DELAY: int = 45
+    THROW_VELOCITY: int = 12  # I like a max of 18
+    MAX_THROW_VELOCITY: int = 18
 
     # About the light the player casts
     BRIGHTNESS: int = 255
     LIGHT_RADIUS: int = 64
+
+    @classmethod
+    def increase_throw_velocity(cls, increase_by: int = 2):
+        cls.THROW_VELOCITY += increase_by
+
+        if cls.THROW_VELOCITY > cls.MAX_THROW_VELOCITY:
+            cls.THROW_VELOCITY = cls.MAX_THROW_VELOCITY
+            return True
+        return False
 
     def __init__(self, center_x: Number, center_y: Number, shadows: Shadows):
         super().__init__(0, 0, 50, 50, self.HEALTH)

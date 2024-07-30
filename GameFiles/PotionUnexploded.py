@@ -16,10 +16,21 @@ class PotionUnexploded:
 
     DAMAGE: int = 10  # I think that 10 as a base and 50 as max is good
     """The damage done upon direct contact with an enemy."""
+    MAX_DAMAGE: int = 50
 
     @classmethod
-    def increase_damage(cls, increase_by: int = 10):
+    def increase_damage(cls, increase_by: int = 10) -> bool:
+        """
+        Attempts to increase the damage.
+        If at max, then True is returned, else false
+        """
+
         cls.DAMAGE += increase_by
+
+        if cls.DAMAGE > cls.MAX_DAMAGE:
+            cls.DAMAGE = cls.MAX_DAMAGE
+            return True
+        return False
 
     def __init__(self, x: int | float, y: int | float, angle: float, velocity: int | float, shadows: Shadows):
         """
