@@ -41,7 +41,7 @@ class EnemyHandler:
 
             new_enemy.set_center((map_.TILE_SIZE * spawn_tile_key[0] + map_.TILE_SIZE_2,
                                   map_.TILE_SIZE * spawn_tile_key[1] + map_.TILE_SIZE_2))
-            new_enemy.set_room_id(room_id, map_)
+            new_enemy.set_room_id(room_id if room_id is not None else -1, map_)
 
             self.enemies.append(new_enemy)
 
