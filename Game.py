@@ -107,7 +107,8 @@ class Game:
 
         self.upgrade_handler.update_and_draw_upgrades(self.player, self.particle_handler, self.camera)
 
-        self.enemy_handler.update_move_and_draw_enemies(self.player, self.map, self.potion_handler, self.camera)
+        self.enemy_handler.update_move_and_draw_enemies(self.player, self.map, self.particle_handler,
+                                                        self.potion_handler, self.camera)
 
         self.particle_handler.update_and_draw_particles(self.camera)
 

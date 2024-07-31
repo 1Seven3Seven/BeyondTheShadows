@@ -8,6 +8,7 @@ from .EnemyStalker import EnemyStalker
 from .Helpers import iter_list_reverse
 from .Map import Map
 from .MapData import MapData
+from .ParticleHandler import ParticleHandler
 from .Player import Player
 from .PotionHandler import PotionHandler
 
@@ -48,6 +49,7 @@ class EnemyHandler:
     def update_move_and_draw_enemies(self,
                                      player: Player,
                                      map_: Map,
+                                     particle_handler: ParticleHandler,
                                      potion_handler: PotionHandler,
                                      camera: Camera) -> None:
         enemy: Enemy
@@ -55,6 +57,6 @@ class EnemyHandler:
             if enemy.health <= 0:
                 del self.enemies[enemy_index]
 
-            enemy.update(player, map_, potion_handler)
+            enemy.update(player, map_, particle_handler, potion_handler)
             enemy.move(map_)
             enemy.draw(camera)

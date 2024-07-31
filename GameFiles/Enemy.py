@@ -1,16 +1,18 @@
 from abc import ABC, abstractmethod
 
-from . import Camera
+from .Camera import Camera
 from .Entity import Entity
 from .Helpers.CommonTypes import Coordinates
 from .Map import Map
+from .ParticleHandler import ParticleHandler
 from .Player import Player
 from .PotionHandler import PotionHandler
 
 
 class Enemy(Entity, ABC):
     @abstractmethod
-    def update(self, player: Player, map_: Map, potion_handler: PotionHandler) -> None:
+    def update(self, player: Player, map_: Map, particle_handler: ParticleHandler,
+               potion_handler: PotionHandler) -> None:
         raise NotImplementedError
 
     @abstractmethod

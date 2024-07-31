@@ -1,3 +1,4 @@
+import math
 import random
 from typing import Callable
 
@@ -8,6 +9,7 @@ from .Enemy import Enemy
 from .Helpers import iter_list_reverse
 from .Helpers.CommonTypes import Number, Coordinates, IntCoordinates
 from .Map import Map
+from .ParticleHandler import ParticleHandler
 from .Player import Player
 from .PotionHandler import PotionHandler
 
@@ -52,6 +54,8 @@ class EnemyStalker(Enemy):
     DAMAGE: int = 1
 
     CIRCLE_TIMER: int = 3
+
+    NUM_DEATH_PARTICLES: int = 30
 
     def __init__(self, x: Number, y: Number, update_offset: int = 0):
         super().__init__(x, y, 32, 32, self.HEALTH)
@@ -200,7 +204,8 @@ class EnemyStalker(Enemy):
             self.damage_timer = self.DAMAGE_TIME
             player.deal_damage(self.DAMAGE)
 
-    def update(self, player: Player, map_: Map, potion_handler: PotionHandler) -> None:
+    def update(self, player: Player, map_: Map, particle_handler: ParticleHandler,
+               potion_handler: PotionHandler) -> None:
         if self.updating:
             self._update_target(player, map_)
             self._damage_player(player)
@@ -212,6 +217,22 @@ class EnemyStalker(Enemy):
             # Prevent the player from damaging the enemy from afar
             if self.health != self.HEALTH:
                 self.updating = True
+            return
+
+        if self.health <= 0:
+            for _ in range(self.NUM_DEATH_PARTICLES):
+                velocity = random.randint(1, 5)
+                angle = random.uniform(0, 2 * math.pi)
+
+                vx = math.cos(angle) * velocity
+                vy = math.sin(angle) * velocity
+
+                particle_handler.create_particle(
+                    "stalker death",
+                    self.rect.centerx, self.rect.centery,
+                    vx, vy,
+                    random.randint(5, 30)
+                )
 
     def move(self, map_: Map) -> None:
         x_diff = self.target[0] - self.rect.centerx
