@@ -143,7 +143,7 @@ class BasicEnemy(Enemy):
         self.move_y(map_, y_move)
 
     def _render_sprite(self):
-        self.sprite.fill((0, 0, 0))
+        self.sprite.fill((0, 0, 0))  # NOQA: Duplicate code
 
         for circle in self.circles:
             self.sub_sprite.fill((0, 0, 0))
