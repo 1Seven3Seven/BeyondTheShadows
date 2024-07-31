@@ -198,30 +198,6 @@ class EnemyStalker(Enemy):
             self.damage_timer = self.DAMAGE_TIME
             player.deal_damage(self.DAMAGE)
 
-    def _update_circles_for_sprite(self) -> None:
-        # Update the circles
-        circle: _Circle
-        for circle_index, circle in iter_list_reverse(self.circles):
-            if circle.radius <= 0:
-                del self.circles[circle_index]
-                continue
-
-            circle.update()
-
-        # Add new circles
-        if self.circle_timer > 0:
-            self.circle_timer -= 1
-            return
-
-        self.circle_timer = self.CIRCLE_TIMER
-
-        self.circles.append(
-            _Circle(
-                self.sprite.get_width() // 2, self.sprite.get_height() // 2,
-                random.uniform(-0.5, 0.5), random.uniform(-0.5, 0.5)
-            )
-        )
-
     def update(self, player: Player, map_: Map, potion_handler: PotionHandler) -> None:
         if self.updating:
             self._update_target(player, map_)
@@ -230,7 +206,6 @@ class EnemyStalker(Enemy):
             player_tile_key = map_.tile_key_for_position(player.rect.center)
             if player_tile_key in self.room_tile_keys:
                 self.updating = True
-
 
     def move(self, map_: Map) -> None:
         x_diff = self.target[0] - self.rect.centerx
@@ -254,6 +229,30 @@ class EnemyStalker(Enemy):
         if abs(y_diff) > 1:
             y_move = -1 if y_diff < 0 else 1
         self.move_y(map_, y_move)
+
+    def _update_circles_for_sprite(self) -> None:
+        # Update the circles
+        circle: _Circle
+        for circle_index, circle in iter_list_reverse(self.circles):
+            if circle.radius <= 0:
+                del self.circles[circle_index]
+                continue
+
+            circle.update()
+
+        # Add new circles
+        if self.circle_timer > 0:
+            self.circle_timer -= 1
+            return
+
+        self.circle_timer = self.CIRCLE_TIMER
+
+        self.circles.append(
+            _Circle(
+                self.sprite.get_width() // 2, self.sprite.get_height() // 2,
+                random.uniform(-0.5, 0.5), random.uniform(-0.5, 0.5)
+            )
+        )
 
     def _render_sprite(self) -> None:
         self.sprite.fill((0, 0, 0))  # NOQA: Duplicate code from basic enemy
