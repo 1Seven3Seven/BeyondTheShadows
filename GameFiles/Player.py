@@ -1,4 +1,5 @@
 import math
+import random
 
 import pygame
 
@@ -8,6 +9,7 @@ from .Helpers import MouseSate
 from .LightSource import LightSource
 from .Map import Map
 from .MapData import MapData
+from .ParticleHandler import ParticleHandler
 from .PotionHandler import PotionHandler
 from .Shadows import Shadows
 from .ShrinkingLightSource import ShrinkingLightSource
@@ -17,7 +19,7 @@ class Player(Entity):
     WIDTH: int = 50
     HEIGHT: int = 50
 
-    HEALTH: int = 100
+    HEALTH: int = 50
     """The initial starting health of the player."""
 
     ATTACK_DELAY: int = 45
@@ -30,6 +32,8 @@ class Player(Entity):
 
     DEATH_TIMER: int = 90
     """How long the death animation lasts in frames."""
+
+    INITIAL_DEATH_NUM_PARTICLES: int = 30
 
     @classmethod
     def increase_throw_velocity(cls, increase_by: int = 2):
@@ -93,13 +97,12 @@ class Player(Entity):
 
         shadows.add_light_source(self.light_source)
 
-    def _begin_death(self, shadows: Shadows) -> None:
+    def _begin_death(self, particle_handler: ParticleHandler, shadows: Shadows) -> None:
         if self.i_am_dead:
             return
 
         self.i_am_dead = True
 
-        # ToDo: do the necessary stuff to begin the death animation
         shadows.remove_light_source(self.light_source)
         shadows.add_updating_light_source(
             ShrinkingLightSource(self.rect.centerx, self.rect.centery,
@@ -107,14 +110,39 @@ class Player(Entity):
                                  self.DEATH_TIMER)
         )
 
-    def _update_death(self, shadows: Shadows) -> None:
+        for _ in range(self.INITIAL_DEATH_NUM_PARTICLES):
+            velocity = random.randint(1, 5)
+            angle = random.uniform(0, 2 * math.pi)
+
+            vx = math.cos(angle) * velocity
+            vy = math.sin(angle) * velocity
+
+            particle_handler.create_particle(
+                "player death",
+                self.rect.centerx, self.rect.centery,
+                vx, vy,
+                random.randint(5, 30)
+            )
+
+    def _update_death(self, particle_handler: ParticleHandler, shadows: Shadows) -> None:
         if self.death_animation_finished:
             return
 
-        self._begin_death(shadows)
+        self._begin_death(particle_handler, shadows)
 
-        # ToDo: set death_animation_finished to true when finished dying
-        # For now, just last half a second
+        # velocity = random.randint(1, 2)
+        # angle = random.uniform(0, 2 * math.pi)
+        #
+        # vx = math.cos(angle) * velocity
+        # vy = math.sin(angle) * velocity
+        #
+        # particle_handler.create_particle(
+        #     "player death 2",
+        #     self.rect.centerx, self.rect.centery,
+        #     vx, vy,
+        #     random.randint(5, 20)
+        # )
+
         if self.death_timer > 0:
             self.death_timer -= 1
             return
@@ -122,12 +150,12 @@ class Player(Entity):
         self.death_animation_finished = True
 
     def update(self, keys: pygame.key.ScancodeWrapper, mouse_state: MouseSate,
-               potion_handler: PotionHandler, shadows: Shadows):
+               particle_handler: ParticleHandler, potion_handler: PotionHandler, shadows: Shadows):
         if self.health > 0:
             self._update_attack(keys, mouse_state, potion_handler, shadows)
             self._update_light_source(shadows)
         else:
-            self._update_death(shadows)
+            self._update_death(particle_handler, shadows)
 
     def move(self, keys: pygame.key.ScancodeWrapper, map_: Map):
         if self.i_am_dead:

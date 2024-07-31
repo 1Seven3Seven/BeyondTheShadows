@@ -92,7 +92,7 @@ class Game:
         self.potion_handler.update(self.map, self.enemy_handler.enemies, self.shadows, self.particle_handler)
 
         self.player.move(keys, self.map)
-        self.player.update(keys, mouse_state, self.potion_handler, self.shadows)
+        self.player.update(keys, mouse_state, self.particle_handler, self.potion_handler, self.shadows)
 
         self.camera.center_on(self.player.rect)
 
