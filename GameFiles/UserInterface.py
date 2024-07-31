@@ -1,5 +1,6 @@
 import pygame
 
+from . import UpgradeDirectDamage, UpgradeExplodedPotionLifespan, UpgradeLightRadius, UpgradeThrowVelocity
 from .EnemyHandler import EnemyHandler
 from .MapData import MapData
 from .Player import Player
@@ -46,6 +47,9 @@ class UserInterface:
         self.enemy_text_rect: pygame.Rect = pygame.Rect(0, 0, 0, 0)
         self.upgrade_text_rect: pygame.Rect = pygame.Rect(0, 0, 0, 0)
 
+        self.recent_upgrade_text: str = ""
+        self.recent_upgrade_text_rect: pygame.Rect = pygame.Rect(0, 0, 0, 0)
+
     def _setup_potion_sprite(self) -> None:
         pass
 
@@ -78,6 +82,19 @@ class UserInterface:
         self.potion_surface.blit(self.potion_sprite, (0, 0))
         self.potion_surface.blit(self.potion_cover_surface, (0, 0), special_flags=pygame.BLEND_RGB_SUB)
 
+    def _update_recent_upgrade(self, upgrade_handler: UpgradeHandler) -> None:
+        if upgrade_handler.most_recent_collected_upgrade is None:
+            return
+
+        if isinstance(upgrade_handler.most_recent_collected_upgrade, UpgradeDirectDamage):
+            self.recent_upgrade_text = "Damage +"
+        elif isinstance(upgrade_handler.most_recent_collected_upgrade, UpgradeExplodedPotionLifespan):
+            self.recent_upgrade_text = "Potion time +"
+        elif isinstance(upgrade_handler.most_recent_collected_upgrade, UpgradeLightRadius):
+            self.recent_upgrade_text = "Light +"
+        elif isinstance(upgrade_handler.most_recent_collected_upgrade, UpgradeThrowVelocity):
+            self.recent_upgrade_text = "Velocity +"
+
     def update(self, player: Player, upgrade_handler: UpgradeHandler, enemy_handler: EnemyHandler) -> None:
         new_width = int(player.health / player.HEALTH * self.PLAYER_HEALTH_RECT_WIDTH)
         if new_width < 0:
@@ -94,6 +111,8 @@ class UserInterface:
         self.upgrade_count = len(upgrade_handler.upgrades)
         self.enemy_count = len(enemy_handler.enemies)
 
+        self._update_recent_upgrade(upgrade_handler)
+
     def _draw_player_health_rect(self, window: pygame.Surface) -> None:
         pygame.draw.rect(window, self.PLAYER_HEALTH_RECT_COLOUR, self.player_health_rect)
         pygame.draw.rect(window, self.PLAYER_HEALTH_RECT_BOARDER_COLOUR, self.player_health_rect, 5)
@@ -105,18 +124,27 @@ class UserInterface:
         self.enemy_text_rect = rendered_text.get_rect()
 
         self.enemy_text_rect.centery = self.player_damage_rect.centery
-        self.enemy_text_rect.x = self.player_damage_rect.right + 10 + self.potion_surface.get_width() + 40
+        self.enemy_text_rect.x = self.player_damage_rect.right + 10 + self.potion_surface.get_width() + 30
 
         window.blit(rendered_text, self.enemy_text_rect)
 
-    def draw_upgrades_left(self, window: pygame.Surface) -> None:
+    def _draw_upgrades_left(self, window: pygame.Surface) -> None:
         rendered_text = self.font.render(f"Upgrades left: {self.upgrade_count}", True, (255, 255, 255))
-        rendered_text_rect = rendered_text.get_rect()
+        self.upgrade_text_rect = rendered_text.get_rect()
 
-        rendered_text_rect.centery = self.player_damage_rect.centery
-        rendered_text_rect.x = self.enemy_text_rect.right + 50
+        self.upgrade_text_rect.centery = self.player_damage_rect.centery
+        self.upgrade_text_rect.x = self.enemy_text_rect.right + 30
 
-        window.blit(rendered_text, rendered_text_rect)
+        window.blit(rendered_text, self.upgrade_text_rect)
+
+    def _draw_most_recent_upgrade(self, window: pygame.Surface) -> None:
+        rendered_text: pygame.Surface = self.font.render(self.recent_upgrade_text, True, (255, 255, 255))
+        self.recent_upgrade_text_rect = rendered_text.get_rect()
+
+        self.recent_upgrade_text_rect.centery = self.upgrade_text_rect.centery
+        self.recent_upgrade_text_rect.x = self.upgrade_text_rect.right + 30
+
+        window.blit(rendered_text, self.recent_upgrade_text_rect)
 
     def render(self, window: pygame.Surface) -> None:
         # Draw the base of the ui
@@ -128,4 +156,5 @@ class UserInterface:
         window.blit(self.potion_surface, (self.player_damage_rect.right + 10, self.player_damage_rect.y + 5))
 
         self._draw_enemies_left(window)
-        self.draw_upgrades_left(window)
+        self._draw_upgrades_left(window)
+        self._draw_most_recent_upgrade(window)

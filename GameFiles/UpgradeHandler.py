@@ -31,6 +31,8 @@ class UpgradeHandler:
     def __init__(self):
         self.upgrades: list[UpgradeBase] = []
 
+        self.most_recent_collected_upgrade: UpgradeBase | None = None
+
     def setup_upgrades_from(self, map_data: MapData, map_: Map) -> None:
         """
         Clears the current upgrades list and create new upgrades from the map data.
@@ -57,4 +59,5 @@ class UpgradeHandler:
             upgrade.draw(camera)
 
             if upgrade.used:
+                self.most_recent_collected_upgrade = upgrade
                 del self.upgrades[upgrade_index]
