@@ -1,4 +1,5 @@
 import asyncio
+# import time
 
 import pygame
 
@@ -14,7 +15,16 @@ game = Game(window)
 async def main():
     while not game.window_closed:
         while game.running:
+            # start = time.perf_counter()
             game.step()
+            # time_elapsed = time.perf_counter() - start
+            # time_elapsed_rounded = round(time_elapsed, 4)
+
+            # print(f"Frame time {time_elapsed_rounded:<06}", end="")
+            # if time_elapsed_rounded > 0.017:
+            #     print(" - too long")
+            # else:
+            #     print()
 
             await asyncio.sleep(0)
 
