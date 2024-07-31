@@ -1,0 +1,199 @@
+:DIMENSIONS
+30,15
+
+# Here is an easier to look at version of the map
+# P = player spawn
+# S = stalker
+#
+# 1 = direct damage upgrade
+#       4 of these  4/4
+# 2 = potion lifespan upgrade
+#       2 of these  2/2
+# 3 = light radius upgrade
+#       4 of these  4/4
+# 4 = throw velocity upgrade
+#       3 of these  3/3
+#
+#    000000000011111111112222222222
+#    012345678901234567890123456789
+# 00 ▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉
+# 01 ▉   ▉   ▉▉▉▉▉ 3▉1     3▉2S   ▉
+# 02 ▉ P   S  1  ▉ ▉▉▉  S  ▉▉▉▉▉▉ ▉
+# 03 ▉   ▉   ▉▉▉ ▉ S ▉ SSS ▉ SSS  ▉
+# 04 ▉▉ ▉▉▉▉▉▉▉4 ▉3  ▉  S  ▉ SSS  ▉
+# 05 ▉   ▉4S  ▉SS▉▉▉ ▉     ▉      ▉
+# 06 ▉ S ▉SS  ▉  ▉   ▉▉▉ ▉▉▉▉▉ ▉▉▉▉
+# 07 ▉   ▉         S    S        1▉
+# 08 ▉▉ ▉▉▉ ▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉ ▉▉
+# 09 ▉▉3▉     S  ▉▉               ▉
+# 10 ▉▉ ▉SS▉ SSS    SSSSSS SSSSSS ▉
+# 11 ▉     ▉  S  ▉▉    SSSSSSS    ▉
+# 12 ▉ ▉▉▉▉▉▉ ▉▉ ▉▉ SSSSSS SSSSSS ▉
+# 13 ▉  S1▉2  ▉4 ▉▉               ▉
+# 14 ▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉
+
+:TILE_DATA
+111111111111111111111111111111
+100010001111100100000001000001
+100000000000101110000011111101
+100010001110100010000010000001
+110111111100100010000010000001
+100010000100111010000010000001
+100010000100100011101111101111
+100010000000000000000000000001
+110111011111111111111111111011
+110100000000110000000000000001
+110100100000000000000000000001
+100000100000110000000000000001
+101111110110110000000000000001
+100001000100110000000000000001
+111111111111111111111111111111
+
+:PLAYER_SPAWN
+2,2
+
+:ROOMS
+# Right of player spawn - 0
+5,1,7,3
+# Below player spawn - 1
+1,5,3,7
+# Bottom most room - 2
+2,13,4,13
+# Two stalkers, just above bottom most - 3
+4,9,5,11
+# Three stalkers, bottom right of the spawn - 4
+5,5,8,7
+# Two stalkers just right of the three - 5
+11,4,12,6
+# Single stalker just right of the two and up slightly - 6
+13,3,15,4
+# Stalker plus near the top right - 7
+17,1,21,5
+# Stalker rectangle right of the top plus - 8
+23,3,28,5
+# Single stalker at the top right - 9
+24,1,26,1
+# Single stalker just right of the two, but down slightly - 10
+13,6,15,7
+# Single stalker in the corridor - 11
+16,7,28,7
+# Stalker plus at the bottom - 12
+7,9,11,11
+
+# Bottom right massive room - 13
+14,9,28,13
+# The bottom right room is split into four smaller rooms
+# Prevents enemies from collecting too much
+
+# Top left - 14
+14,9,27,12
+# Top right - 15
+15,9,28,12
+# Bottom left - 16
+14,10,27,13
+# Bottom right - 17
+15,10,28,13
+
+:ENEMIES
+# Right of player spawn
+stalker,6,2,0
+# Below player spawn
+stalker,2,6,1
+# Bottom most
+stalker,3,13,2
+# Just above the bottom most
+stalker,4,10,3
+stalker,5,10,3
+# Three stalkers, bottom right
+stalker,6,5,4
+stalker,5,6,4
+stalker,6,6,4
+# Two stalkers just right of the three
+stalker,10,5,5
+stalker,11,5,5
+# Single stalker just right of the two and up slightly
+stalker,14,3,6
+# Stalker plus near the top right
+stalker,19,2,7
+stalker,19,3,7
+stalker,19,4,7
+stalker,18,3,7
+stalker,20,3,7
+# Stalker rectangle right of the top plus
+stalker,24,3,8
+stalker,25,3,8
+stalker,26,3,8
+stalker,24,4,8
+stalker,25,4,8
+stalker,26,4,8
+# Single stalker at the top right
+stalker,25,1,9
+# Single stalker just right of the two, but down slightly
+stalker,14,7,10
+# Single stalker in the corridor
+stalker,19,7,11
+# Stalker plus at the bottom
+stalker,9,9,12
+stalker,9,10,12
+stalker,9,11,12
+stalker,8,10,12
+stalker,10,10,12
+
+# Massive room
+stalker,18,11,13
+stalker,19,11,13
+stalker,20,11,13
+stalker,21,11,13
+stalker,22,11,13
+stalker,23,11,13
+stalker,24,11,13
+
+# Top left
+stalker,15,10,14
+stalker,16,10,14
+stalker,17,10,14
+stalker,18,10,14
+stalker,19,10,14
+stalker,20,10,14
+
+# Top right
+stalker,22,10,15
+stalker,23,10,15
+stalker,24,10,15
+stalker,25,10,15
+stalker,26,10,15
+stalker,27,10,15
+
+# Bottom left
+stalker,15,12,16
+stalker,16,12,16
+stalker,17,12,16
+stalker,18,12,16
+stalker,19,12,16
+stalker,20,12,16
+
+# Bottom right
+stalker,22,12,17
+stalker,23,12,17
+stalker,24,12,17
+stalker,25,12,17
+stalker,26,12,17
+stalker,27,12,17
+
+:UPGRADES
+u_direct_damage,9,2,0,0
+u_direct_damage,16,1,-50,50
+u_direct_damage,28,7,50,0
+u_direct_damage,4,13,50,-50
+
+u_exploded_potion_lifespan,24,1,-50,50
+u_exploded_potion_lifespan,6,13,-50,-50
+
+u_light_radius,2,9,0,0
+u_light_radius,13,4,-50,50
+u_light_radius,14,1,50,-50
+u_light_radius,22,1,50,-50
+
+u_throw_velocity,5,5,-50,-50
+u_throw_velocity,10,4,-50,-50
+u_throw_velocity,10,13,-50,50
