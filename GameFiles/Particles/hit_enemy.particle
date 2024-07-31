@@ -1,0 +1,11 @@
+KEY
+hit enemy
+
+IS_SQUARE
+0
+
+SIZE
+5
+
+COLOUR
+255,50,50,127

@@ -1,4 +1,5 @@
 import math
+import random
 
 import pygame
 
@@ -17,6 +18,8 @@ class PotionUnexploded:
     DAMAGE: int = 10  # I think that 10 as a base and 50 as max is good
     """The damage done upon direct contact with an enemy."""
     MAX_DAMAGE: int = 50
+
+    NUM_EXPLODE_PARTICLES: int = 10
 
     @classmethod
     def increase_damage(cls, increase_by: int = 10) -> bool:
@@ -63,9 +66,44 @@ class PotionUnexploded:
 
         self.damage: int = self.DAMAGE
 
-    def explode(self, shadows: Shadows) -> None:
+    def _explode_particles_hit_enemy(self, particle_handler: ParticleHandler) -> None:
+        for _ in range(self.NUM_EXPLODE_PARTICLES):
+            velocity = random.randint(2, 4)
+            angle = self.angle + random.uniform(-math.pi / 8, math.pi / 8)  # -45/2 to 45/2 degrees
+
+            vx = math.cos(angle) * velocity
+            vy = math.sin(angle) * velocity
+
+            particle_handler.create_particle(
+                "hit enemy",
+                self.x, self.y,
+                vx, vy,
+                random.randint(10, 20)
+            )
+
+    def _explode_particles_wear_out(self, particle_handler: ParticleHandler) -> None:
+        for _ in range(self.NUM_EXPLODE_PARTICLES):
+            velocity = random.randint(1, 2)
+            angle = self.angle + random.uniform(-math.pi / 8, math.pi / 8)  # -45/2 to 45/2 degrees
+
+            vx = math.cos(angle) * velocity
+            vy = math.sin(angle) * velocity
+
+            particle_handler.create_particle(
+                "hit enemy",
+                self.x, self.y,
+                vx, vy,
+                random.randint(5, 15)
+            )
+
+    def explode(self, particle_handler: ParticleHandler, shadows: Shadows) -> None:
         self.exploded = True
         shadows.remove_light_source(self.light_source)
+
+        if self.collided_with_enemy:
+            self._explode_particles_hit_enemy(particle_handler)
+        # else:
+        #     self._explode_particles_wear_out(particle_handler)
 
     def _move_and_update_light_source(self, shadows: Shadows) -> None:
         self.x += self.vx * self.velocity
@@ -85,7 +123,7 @@ class PotionUnexploded:
 
         # If no longer moving
         if self.velocity <= 0:
-            self.explode(shadows)
+            self.explode(particle_handler, shadows)
             return
 
         self._move_and_update_light_source(shadows)
@@ -98,12 +136,12 @@ class PotionUnexploded:
             if self.rect.colliderect(enemy.rect):
                 enemy.deal_damage(self.damage)
                 self.collided_with_enemy = True
-                self.explode(shadows)
+                self.explode(particle_handler, shadows)
 
         # Check for collisions with tiles
         for rect in map_.surrounding_tiles(self.x, self.y):
             if rect.collidepoint(self.x, self.y):
-                self.explode(shadows)
+                self.explode(particle_handler, shadows)
 
     def draw(self, camera: Camera) -> None:
         # ToDo: draw the potion
