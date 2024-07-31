@@ -132,10 +132,10 @@ class Shadows:
         tile_rect = tile_surface.get_rect()
 
         tile_x_min = int(camera.rect.left // self.TILE_SIZE) - 1
-        tile_x_max = int(camera.rect.right // self.TILE_SIZE) + 2
+        tile_x_max = int(camera.rect.right // self.TILE_SIZE) + 1
 
         tile_y_min = int(camera.rect.top // self.TILE_SIZE) - 1
-        tile_y_max = int(camera.rect.bottom // self.TILE_SIZE) + 2
+        tile_y_max = int(camera.rect.bottom // self.TILE_SIZE) + 1
 
         if tile_x_min < 0:
             tile_x_min = 0
