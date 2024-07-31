@@ -52,6 +52,8 @@ class Game:
 
         self.running = True
 
+        self.particle_handler.clear_particles()
+
         self.map.generate_from(self.map_data)
 
         self.camera.set_min_max_position(*self.map.min_max_positions())

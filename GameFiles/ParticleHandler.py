@@ -21,6 +21,9 @@ class ParticleHandler:
     def __init__(self):
         self.particles: list[Particle] = []
 
+    def clear_particles(self) -> None:
+        self.particles = []
+
     @staticmethod
     def _read_particle_data(particle_file_path: pathlib.Path) -> dict[_ParticleDataKeys, ...]:
         particle_data = {}
