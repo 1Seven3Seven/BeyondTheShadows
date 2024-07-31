@@ -31,7 +31,7 @@ class Game:
         self.enemy_handler: GameFiles.EnemyHandler = GameFiles.EnemyHandler()
         self.user_interface: GameFiles.UserInterface = GameFiles.UserInterface()
 
-        self.generate_from_map_data(pathlib.Path("GameFiles/Maps/test.mapdata"))
+        self.generate_from_map_data(pathlib.Path("GameFiles/Maps/demo.mapdata"))
 
     def generate_from_map_data(self, map_data_file: pathlib.Path) -> None:
         """
