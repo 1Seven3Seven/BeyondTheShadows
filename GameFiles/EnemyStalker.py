@@ -1,6 +1,7 @@
-import pygame
 import random
 from typing import Callable
+
+import pygame
 
 from .Camera import Camera
 from .Enemy import Enemy
@@ -38,6 +39,8 @@ class _Circle:
 
 
 class EnemyStalker(Enemy):
+    HEALTH: int = 100
+
     TARGET_RADIUS = 16
     TARGET_RADIUS_SQUARED = TARGET_RADIUS * TARGET_RADIUS
     TARGET_TIME = 10
@@ -51,7 +54,7 @@ class EnemyStalker(Enemy):
     CIRCLE_TIMER: int = 3
 
     def __init__(self, x: Number, y: Number, update_offset: int = 0):
-        super().__init__(x, y, 32, 32, 100)
+        super().__init__(x, y, 32, 32, self.HEALTH)
 
         self.target: Coordinates = self.rect.center
         self.target_timer: int = self.TARGET_TIME + update_offset
@@ -204,6 +207,10 @@ class EnemyStalker(Enemy):
         else:
             player_tile_key = map_.tile_key_for_position(player.rect.center)
             if player_tile_key in self.room_tile_keys:
+                self.updating = True
+                return
+            # Prevent the player from damaging the enemy from afar
+            if self.health != self.HEALTH:
                 self.updating = True
 
     def move(self, map_: Map) -> None:
