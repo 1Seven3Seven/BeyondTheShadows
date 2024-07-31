@@ -49,6 +49,7 @@ class PotionUnexploded:
         self.rect: pygame.Rect = pygame.Rect(0, 0, self.SIZE, self.SIZE)
 
         self.angle = angle
+        self.max_velocity = velocity
         self.velocity = velocity
 
         self.vx = math.cos(angle)
@@ -116,6 +117,23 @@ class PotionUnexploded:
         self.light_source.y = self.y
         shadows.add_light_source(self.light_source)
 
+    def _spawn_flight_particles(self, particle_handler: ParticleHandler) -> None:
+        multiplier = self.velocity / self.max_velocity
+
+        for _ in range(5):
+            velocity = random.uniform(0, 1) * multiplier
+            angle = random.uniform(0, math.pi * 2)
+
+            vx = math.cos(angle) * velocity
+            vy = math.sin(angle) * velocity
+
+            particle_handler.create_particle(
+                "unexploded flight",
+                self.x, self.y,
+                vx + random.uniform(-1, 1), vy + random.uniform(-1, 1),
+                random.randint(5, 15)
+            )
+
     def update(self, map_: Map, enemies: list[Entity], shadows: Shadows, particle_handler: ParticleHandler) -> None:
         # Should not occur, but if the potion has collided with something, then do not update
         if self.exploded:
@@ -127,6 +145,7 @@ class PotionUnexploded:
             return
 
         self._move_and_update_light_source(shadows)
+        self._spawn_flight_particles(particle_handler)
 
         # Position the collision rectangle
         self.rect.center = self.x, self.y
