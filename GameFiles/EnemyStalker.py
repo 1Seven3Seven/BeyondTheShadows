@@ -12,6 +12,32 @@ from .Player import Player
 from .PotionHandler import PotionHandler
 
 
+class _Circle:
+    INITIAL_RADIUS = 30
+    RADIUS_DECAY = INITIAL_RADIUS / 100
+
+    def __init__(self, x: Number, y: Number, vx: Number, vy: Number):
+        self.x: Number = x
+        self.y: Number = y
+
+        self.vx: Number = vx
+        self.vy: Number = vy
+
+        self.radius: Number = self.INITIAL_RADIUS
+
+    def update(self) -> None:
+        self.x += self.vx
+        self.y += self.vy
+
+        self.radius -= self.RADIUS_DECAY
+
+    def __str__(self) -> str:
+        return f"Circle({round(self.x, 3)}, {round(self.y, 3)}, {round(self.radius, 3)})"
+
+    def __repr__(self) -> str:
+        return self.__str__()
+
+
 class EnemyStalker(Enemy):
     TARGET_RADIUS = 16
     TARGET_RADIUS_SQUARED = TARGET_RADIUS * TARGET_RADIUS
@@ -22,6 +48,8 @@ class EnemyStalker(Enemy):
 
     DAMAGE_TIME: int = 2
     DAMAGE: int = 1
+
+    CIRCLE_TIMER: int = 3
 
     def __init__(self, x: Number, y: Number, update_offset: int = 0):
         super().__init__(x, y, 32, 32, 100)
@@ -34,6 +62,16 @@ class EnemyStalker(Enemy):
         self.room_tile_keys: list[IntCoordinates] | None = None
         self._choose_new_tile_as_target: Callable[[Map], None] = self._choose_new_tile_as_target_no_room
         self._target_player: Callable[[Player, Map], bool] = self._target_player_no_room
+
+        self.circles: list[_Circle] = []
+        self.circle_timer: int = self.CIRCLE_TIMER
+
+        self.sprite: pygame.Surface = pygame.Surface((self.rect.w + _Circle.INITIAL_RADIUS * 4,
+                                                      self.rect.h + _Circle.INITIAL_RADIUS * 4))
+        self.sprite_rect = self.sprite.get_rect()
+
+        self.sub_sprite: pygame.Surface = pygame.Surface((_Circle.INITIAL_RADIUS * 2, _Circle.INITIAL_RADIUS * 2))
+        self.sub_sprite_rect = self.sub_sprite.get_rect()
 
     def _distance_to_position_squared(self, position: Coordinates) -> tuple[Number, Number, Number]:
         """
@@ -158,9 +196,34 @@ class EnemyStalker(Enemy):
             self.damage_timer = self.DAMAGE_TIME
             player.deal_damage(self.DAMAGE)
 
+    def _update_circles_for_sprite(self) -> None:
+        # Update the circles
+        circle: _Circle
+        for circle_index, circle in iter_list_reverse(self.circles):
+            if circle.radius <= 0:
+                del self.circles[circle_index]
+                continue
+
+            circle.update()
+
+        # Add new circles
+        if self.circle_timer > 0:
+            self.circle_timer -= 1
+            return
+
+        self.circle_timer = self.CIRCLE_TIMER
+
+        self.circles.append(
+            _Circle(
+                self.sprite.get_width() // 2, self.sprite.get_height() // 2,
+                random.uniform(-0.5, 0.5), random.uniform(-0.5, 0.5)
+            )
+        )
+
     def update(self, player: Player, map_: Map, potion_handler: PotionHandler) -> None:
         self._update_target(player, map_)
         self._damage_player(player)
+        self._update_circles_for_sprite()
 
     def move(self, map_: Map) -> None:
         x_diff = self.target[0] - self.rect.centerx
@@ -185,17 +248,35 @@ class EnemyStalker(Enemy):
             y_move = -1 if y_diff < 0 else 1
         self.move_y(map_, y_move)
 
+    def _render_sprite(self) -> None:
+        self.sprite.fill((0, 0, 0))  # NOQA: Duplicate code from basic enemy
+
+        for circle in self.circles:
+            self.sub_sprite.fill((0, 0, 0))
+            pygame.draw.circle(self.sub_sprite, (10, 10, 10),
+                               (self.sub_sprite.get_width() // 2, self.sub_sprite.get_height() // 2),
+                               circle.radius)
+
+            self.sub_sprite_rect.center = circle.x, circle.y
+            self.sprite.blit(self.sub_sprite, self.sub_sprite_rect, special_flags=pygame.BLEND_RGB_ADD)
+
     def draw(self, camera: Camera) -> None:
-        if not camera.can_see(self.rect):
+        self.sprite_rect.center = self.rect.center
+
+        if not camera.can_see(self.sprite_rect):
             return
 
+        self._render_sprite()
+        camera.convert_rect_to_camera_coordinates(self.sprite_rect)
+        camera.window.blit(self.sprite, self.sprite_rect, special_flags=pygame.BLEND_RGB_SUB)
+
         # For now a simple purple circle
-        camera_coords = camera.coordinates_to_display_coordinates(self.rect.center)
-        pygame.draw.circle(camera.window, (255, 0, 255), camera_coords, 16)
+        # camera_coords = camera.coordinates_to_display_coordinates(self.rect.center)
+        # pygame.draw.circle(camera.window, (255, 0, 255), camera_coords, 16)
 
         # Drawing the target
-        camera_coords = camera.coordinates_to_display_coordinates(self.target)
-        pygame.draw.circle(camera.window, (255, 0, 0), camera_coords, 5)
+        # camera_coords = camera.coordinates_to_display_coordinates(self.target)
+        # pygame.draw.circle(camera.window, (255, 0, 0), camera_coords, 5)
 
     def set_room_id(self, room_id: int, map_: Map) -> None:
         """
