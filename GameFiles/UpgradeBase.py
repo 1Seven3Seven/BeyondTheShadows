@@ -4,6 +4,7 @@ import pygame
 
 from .Camera import Camera
 from .Helpers.CommonTypes import Number, Coordinates
+from .ParticleHandler import ParticleHandler
 from .Player import Player
 
 
@@ -22,16 +23,17 @@ class UpgradeBase(ABC):
         self.used: bool = False
         """If the player has used this upgrade, it is to be removed."""
 
-    def update(self, player: Player) -> None:
+    def update(self, player: Player, particle_handler: ParticleHandler) -> None:
         self.rect.center = self.position
 
         if self.rect.colliderect(player.rect):
-            self.effect()
+            self.effect(particle_handler)
             self.used = True
 
     @abstractmethod
-    def effect(self) -> None:
+    def effect(self, particle_handler: ParticleHandler) -> None:
         """
+        Called upon a collision with the player.
         Causes the upgrade to cause an effect.
         """
 

@@ -4,6 +4,7 @@ from .Camera import Camera
 from .Helpers import iter_list_reverse
 from .Map import Map
 from .MapData import MapData
+from .ParticleHandler import ParticleHandler
 from .Player import Player
 from .UpgradeBase import UpgradeBase
 from .UpgradeDirectDamage import UpgradeDirectDamage
@@ -49,10 +50,10 @@ class UpgradeHandler:
 
             self.upgrades.append(new_upgrade)
 
-    def update_and_draw_upgrades(self, player: Player, camera: Camera) -> None:
+    def update_and_draw_upgrades(self, player: Player, particle_handler: ParticleHandler, camera: Camera) -> None:
         upgrade: UpgradeBase
         for upgrade_index, upgrade in iter_list_reverse(self.upgrades):
-            upgrade.update(player)
+            upgrade.update(player, particle_handler)
             upgrade.draw(camera)
 
             if upgrade.used:
