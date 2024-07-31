@@ -136,7 +136,7 @@ class PotionExploded:
         for enemy in enemies:
             if self.rect.colliderect(enemy.rect):
                 enemy.deal_damage(self.damage)
-                self.health -= 1
+                self.health -= 2
 
                 if self.health <= 0:
                     return True
