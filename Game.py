@@ -61,8 +61,11 @@ class Game:
         self.shadows.setup_for_map(self.map)
 
         self.potion_handler.clear_potions()
+        GameFiles.PotionExploded.reset_upgrades()
+        GameFiles.PotionUnexploded.reset_upgrades()
 
         self.player.setup_from(self.map_data, self.map)
+        GameFiles.Player.reset_upgrades()
 
         self.upgrade_handler.setup_upgrades_from(self.map_data, self.map)
 

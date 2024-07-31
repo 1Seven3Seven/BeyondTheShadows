@@ -23,6 +23,7 @@ class Player(Entity):
     """The initial starting health of the player."""
 
     ATTACK_DELAY: int = 45
+    START_THROW_VELOCITY: int = 12
     THROW_VELOCITY: int = 12  # I like a max of 18
     MAX_THROW_VELOCITY: int = 18
 
@@ -34,6 +35,10 @@ class Player(Entity):
     """How long the death animation lasts in frames."""
 
     INITIAL_DEATH_NUM_PARTICLES: int = 30
+
+    @classmethod
+    def reset_upgrades(cls) -> None:
+        cls.THROW_VELOCITY = cls.START_THROW_VELOCITY
 
     @classmethod
     def increase_throw_velocity(cls, increase_by: int = 2):

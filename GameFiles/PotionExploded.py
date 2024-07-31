@@ -14,7 +14,8 @@ from .ShrinkingLightSource import ShrinkingLightSource
 class PotionExploded:
     # Light source stats
     BRIGHTNESS: int = 300
-    LIGHT_RADIUS: int = 80  # I like 80 as a start, and 128 as the max
+    START_LIGHT_RADIUS: int = 80
+    LIGHT_RADIUS: int = START_LIGHT_RADIUS  # I like 80 as a start, and 128 as the max
     MAX_LIGHT_RADIUS: int = 128
     LIGHT_RADIUS_SQRT_2 = int(LIGHT_RADIUS * math.sqrt(2))
 
@@ -22,6 +23,7 @@ class PotionExploded:
     """The delay in frames between spawning particles."""
     PARTICLE_LIFESPAN: int = 20
 
+    START_HEALTH: int = 100
     HEALTH: int = 100  # 100 as base and 200 as max
     """
     The 'health' of the potion.
@@ -41,6 +43,11 @@ class PotionExploded:
     NUM_DOUBLE_EXPLODE_PARTICLES = 10
 
     # Note the max damage delt via exposure is HEALTH * DAMAGE
+
+    @classmethod
+    def reset_upgrades(cls) -> None:
+        cls.LIGHT_RADIUS = cls.START_LIGHT_RADIUS
+        cls.HEALTH = cls.START_HEALTH
 
     @classmethod
     def increase_light_radius(cls, increase_by: int = 16) -> bool:
@@ -144,7 +151,6 @@ class PotionExploded:
         )
 
         for _ in range(self.NUM_DOUBLE_EXPLODE_PARTICLES):
-
             velocity = random.randint(1, 3)
             angle = random.uniform(0, 2 * math.pi)
 

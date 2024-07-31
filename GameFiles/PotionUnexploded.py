@@ -15,11 +15,16 @@ class PotionUnexploded:
     SIZE = 10 * 1.5
     """The size of the square hitbox given a circle of radius 10 as the sprite."""
 
+    START_DAMAGE: int = 10
     DAMAGE: int = 10  # I think that 10 as a base and 50 as max is good
     """The damage done upon direct contact with an enemy."""
     MAX_DAMAGE: int = 50
 
     NUM_EXPLODE_PARTICLES: int = 10
+
+    @classmethod
+    def reset_upgrades(cls) -> None:
+        cls.DAMAGE = cls.START_DAMAGE
 
     @classmethod
     def increase_damage(cls, increase_by: int = 10) -> bool:
