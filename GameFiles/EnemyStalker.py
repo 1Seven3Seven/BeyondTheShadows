@@ -73,6 +73,8 @@ class EnemyStalker(Enemy):
         self.sub_sprite: pygame.Surface = pygame.Surface((_Circle.INITIAL_RADIUS * 2, _Circle.INITIAL_RADIUS * 2))
         self.sub_sprite_rect = self.sub_sprite.get_rect()
 
+        self.updating: bool = False
+
     def _distance_to_position_squared(self, position: Coordinates) -> tuple[Number, Number, Number]:
         """
         Calculates the distance to the target.
@@ -221,9 +223,14 @@ class EnemyStalker(Enemy):
         )
 
     def update(self, player: Player, map_: Map, potion_handler: PotionHandler) -> None:
-        self._update_target(player, map_)
-        self._damage_player(player)
-        self._update_circles_for_sprite()
+        if self.updating:
+            self._update_target(player, map_)
+            self._damage_player(player)
+        else:
+            player_tile_key = map_.tile_key_for_position(player.rect.center)
+            if player_tile_key in self.room_tile_keys:
+                self.updating = True
+
 
     def move(self, map_: Map) -> None:
         x_diff = self.target[0] - self.rect.centerx
@@ -266,6 +273,7 @@ class EnemyStalker(Enemy):
         if not camera.can_see(self.sprite_rect):
             return
 
+        self._update_circles_for_sprite()
         self._render_sprite()
         camera.convert_rect_to_camera_coordinates(self.sprite_rect)
         camera.window.blit(self.sprite, self.sprite_rect, special_flags=pygame.BLEND_RGB_SUB)
