@@ -131,16 +131,32 @@ class Shadows:
         tile_surface = pygame.Surface((self.TILE_SIZE, self.TILE_SIZE))
         tile_rect = tile_surface.get_rect()
 
-        for tile_x in range(self.width):
+        tile_x_min = int(camera.rect.left // self.TILE_SIZE) - 1
+        tile_x_max = int(camera.rect.right // self.TILE_SIZE) + 2
+
+        tile_y_min = int(camera.rect.top // self.TILE_SIZE) - 1
+        tile_y_max = int(camera.rect.bottom // self.TILE_SIZE) + 2
+
+        if tile_x_min < 0:
+            tile_x_min = 0
+        if tile_x_max >= self.width:
+            tile_x_max = self.width
+
+        if tile_y_min < 0:
+            tile_y_min = 0
+        if tile_y_max >= self.height:
+            tile_y_max = self.height
+
+        for tile_x in range(tile_x_min, tile_x_max):
             tile_x_position = tile_x * self.TILE_SIZE
 
-            for tile_y in range(self.height):
+            for tile_y in range(tile_y_min, tile_y_max):
                 tile_y_position = tile_y * self.TILE_SIZE
 
                 tile_rect.topleft = tile_x_position, tile_y_position
 
-                if not camera.can_see(tile_rect):
-                    continue
+                # if not camera.can_see(tile_rect):
+                #     continue
 
                 camera.convert_rect_to_camera_coordinates(tile_rect)
 
