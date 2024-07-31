@@ -1,8 +1,6 @@
 import random
 from typing import Callable
 
-import pygame.draw
-
 from .Camera import Camera
 from .Enemy import Enemy
 from .Helpers import iter_list_reverse
@@ -276,14 +274,6 @@ class EnemyStalker(Enemy):
         self._render_sprite()
         camera.convert_rect_to_camera_coordinates(self.sprite_rect)
         camera.window.blit(self.sprite, self.sprite_rect, special_flags=pygame.BLEND_RGB_SUB)
-
-        # For now a simple purple circle
-        # camera_coords = camera.coordinates_to_display_coordinates(self.rect.center)
-        # pygame.draw.circle(camera.window, (255, 0, 255), camera_coords, 16)
-
-        # Drawing the target
-        # camera_coords = camera.coordinates_to_display_coordinates(self.target)
-        # pygame.draw.circle(camera.window, (255, 0, 0), camera_coords, 5)
 
     def set_room_id(self, room_id: int, map_: Map) -> None:
         """
